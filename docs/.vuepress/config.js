@@ -101,4 +101,9 @@ module.exports = {
         sidebarDepth: 3,
         lastUpdated: 'Last Updated',
     },
+    plugins: [
+        ['vuepress-plugin-reading-time'],
+        ['vuepress-plugin-reading-progress'],
+        ['@vuepress/back-to-top']
+    ]
 };

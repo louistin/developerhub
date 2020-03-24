@@ -89,6 +89,3 @@ Ctrl + Sgift + I    格式化代码
 
 # node_modules 没办法, npm 机制就是放在项目目录下的, 不好配制成全局的
 ```
-
-{{$page.readingTime.words}}
-{{Math.ceil($page.readingTime.minutes)}}

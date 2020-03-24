@@ -1,14 +1,14 @@
 ---
 home: true
-heroImage: /image/liteman.gif
+heroImage: /image/logo.png
 actionText: Developer →
 actionLink: /manual/
 features:
-- title: 最佳实践
-  details: 最佳实践总结
-- title: 参考指南
-  details: 开发参考指南
-- title: 开发服务
-  details: 源于积累 服务开发
+- title: 昨天
+  details: 昨夜西风凋碧树, 独上高楼, 望尽天涯路.
+- title: 今天
+  details: 衣带渐宽终不悔, 为伊消得人憔悴.
+- title: 明天
+  details: 众里寻他千百度, 蓦然回首, 那人却在灯火阑珊处.
 footer: Copyright © 2019 - 2020 LiteMan
 ---

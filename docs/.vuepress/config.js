@@ -1,8 +1,8 @@
 module.exports = {
-    title: 'Develop Service',
-    description: '源于积累, 服务开发',
+    title: '开发手册',
+    description: '源于积累 服务开发',
     head: [
-        ['link', { rel: 'icon', href: '/image/liteman.gif' }]
+        ['link', { rel: 'icon', href: '/image/chrome.png' }]
     ],
     base: '/blog/',
     markdown: {

@@ -9,5 +9,8 @@
     "docs:build": "vuepress build docs"
   },
   "author": "Louis <louis.tianlu@gmail.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "vuepress": "^1.4.0"
+  }
 }

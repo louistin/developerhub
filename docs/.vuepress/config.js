@@ -93,7 +93,7 @@ module.exports = {
                 "SpringBoot + Vue FAQ",
                 "Supervisor FAQ"
             ],
-            '/os': [
+            '/os/': [
                 {
                     title: 'Linux', 
                     collapsable: true,
@@ -105,7 +105,7 @@ module.exports = {
                     title: 'Windows', 
                     collapsable: true,
                     children: [
-                        '/os/windows/Windows FAQ' // 你的md文件地址
+                        "/os/windows/Windows FAQ" // 你的md文件地址
                     ]
                 }
 

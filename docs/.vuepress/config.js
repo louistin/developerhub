@@ -63,6 +63,7 @@ module.exports = {
                     { text: 'HTML', link: '/web/html/' },
                     { text: 'CSS', link: '/web/css/' },
                     { text: 'Vue', link: '/web/vue/' },
+                    { text: 'FAQ', link: '/web/faq/' },
                 ]
             },
             {
@@ -107,6 +108,38 @@ module.exports = {
                     children: [
                         "/os/windows/",
                         "/os/windows/Windows FAQ" // 你的md文件地址
+                    ]
+                }
+
+            ],
+            '/web/': [
+                {
+                    title: 'JavaScript',
+                    collapsable: true,
+                    children: [
+                        "/web/javascript/"
+                    ]
+                },
+                {
+                    title: 'HTML',
+                    collapsable: true,
+                    children: [
+                        "/web/html/"
+                    ]
+                },
+                {
+                    title: 'CSS',
+                    collapsable: true,
+                    children: [
+                        "/web/css/"
+                    ]
+                },
+                {
+                    title: 'FAQ',
+                    collapsable: true,
+                    children: [
+                        "/web/faq/",
+                        "/web/faq/HTTP 跨域处理"
                     ]
                 }
 

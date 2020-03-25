@@ -95,13 +95,6 @@ module.exports = {
             ],
             '/os/': [
                 {
-                    title: 'Linux', 
-                    collapsable: true,
-                    children: [
-                        '/os/linux/' // 你的md文件地址
-                    ]
-                },
-                {
                     title: 'Windows', 
                     collapsable: true,
                     children: [

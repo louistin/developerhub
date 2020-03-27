@@ -71,7 +71,8 @@ module.exports = {
                 items: [
                     { text: 'Nginx', link: '/opensource/nginx/' },
                     { text: 'Libevent', link: '/opensource/libevent/' },
-                    { text: 'Redis', link: '/opensource/redis/' }
+                    { text: 'Redis', link: '/opensource/redis/' },
+                    { text: 'Others', link: '/opensource/others/' }
                 ]
             },
             {
@@ -143,6 +144,37 @@ module.exports = {
                     ]
                 }
 
+            ],
+            '/opensource': [
+                {
+                    title: 'Nginx',
+                    collapsable: true,
+                    children: [
+                        "/opensource/nginx/"
+                    ]
+                },
+                {
+                    title: 'Lievent',
+                    collapsable: true,
+                    children: [
+                        "/opensource/libevent/"
+                    ]
+                },
+                {
+                    title: 'Redis',
+                    collapsable: true,
+                    children: [
+                        "/opensource/redis/"
+                    ]
+                },
+                {
+                    title: 'Others', 
+                    collapsable: true,
+                    children: [
+                        "/opensource/others/",
+                        "/opensource/others/Easylogger Linux 平台静态库编译"
+                    ]
+                }
             ],
             '/about/': [
                 ""

@@ -39,4 +39,12 @@
     * 调整输出模式
     * 重新添加一个 init 函数, 以后使用直接初始化
 
+## 3. 使用方法
+* 头文件 `easylogger/inc`
+* 编译选项 `-lpthread`
+* 编译参考
+    ```
+    gcc main.c -o main -L./out/ -leasylogger -I./easylogger/inc/ -lpthread
+    ```
+
 ## FAQ

@@ -51,7 +51,7 @@ module.exports = {
                 text: '网络编程',
                 items: [
                     { text: 'Socket', link: '/network/socket/' },
-                    { text: 'TCP/IP', link: '/network/tcp-ip/' },
+                    { text: 'TCP/IP', link: '/network/tcpip/' },
                     { text: 'HTTP', link: '/network/http/' }
                 ]
             },
@@ -104,7 +104,7 @@ module.exports = {
                     ]
                 },
                 {
-                    title: 'Windows', 
+                    title: 'Windows',
                     collapsable: true,
                     children: [
                         "/os/windows/",
@@ -168,7 +168,7 @@ module.exports = {
                     ]
                 },
                 {
-                    title: 'Others', 
+                    title: 'Others',
                     collapsable: true,
                     children: [
                         "/opensource/others/",
@@ -179,6 +179,29 @@ module.exports = {
             '/discuz/': [
                 "",
                 "开发技能树"
+            ],
+            '/network': [
+                {
+                    title: 'TCP/IP',
+                    collapsable: true,
+                    children: [
+                        "/network/tcpip/"
+                    ]
+                },
+                {
+                    title: 'Socket',
+                    collapsable: true,
+                    children: [
+                        "/network/socket/"
+                    ]
+                },
+                {
+                    title: 'HTTP',
+                    collapsable: true,
+                    children: [
+                        "/network/http/"
+                    ]
+                }
             ],
             '/about/': [
                 ""

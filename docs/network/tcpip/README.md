@@ -240,8 +240,8 @@
 
 ## HTTP
 
-    <img :src="$withBase('/image/network/httprequest001.png')" alt="HTTP 请求">
-    <img :src="$withBase('/image/network/httpresponse001.png')" alt="HTTP 响应">
+<img :src="$withBase('/image/network/httprequest001.png')" alt="HTTP 请求">
+<img :src="$withBase('/image/network/httpresponse001.png')" alt="HTTP 响应">
 
 * 响应状态码
     ```bash

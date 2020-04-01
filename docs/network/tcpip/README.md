@@ -138,6 +138,47 @@
 
 ---
 
+## Socket
+
+* Socket 创建
+    ```bash
+    Socket 其实是使用 <peer_addr:peer_port, local_addr:local_port> 四元组来区别不同
+      socket 实例.
+    一个客户端连接情况下, 有三个 socket
+        服务端负责监听 ServerSocket <*:*, *:9877> 可接受任何客户端和本地任何 IP
+        accept 返回 socket <127.0.0.1:client_port, 127.0.0.1:9877>
+        客户端 socket <server_ip:9877, 127.0.0.1:client_port>
+    ```
+
+* Socket 读写
+
+    **Socket 读写**<br>
+    <img :src="$withBase('/image/network/socket_rdwr_001.gif')" alt="Socket 读写">
+
+    ```bash
+    read buffer, write buffer
+        调用系统 API 对 socket 进行写操作是将数据拷贝到套接字对象的 write buffer, 内核网
+          络模块会有专门的单独线程负责将 write buffer 的数据拷贝到网卡, 网卡再将数据发送
+        读数据操作是调用系统 API 将 read buffer 的数据拷贝到用户程序内存中来
+
+    阻塞
+        write buffer 空间有限, 如果应用程序写数据太快, 空间写满了, 写操作就会阻塞, 直到这个
+          空间有足够的位置空出来. NIO 写操作不阻塞, 通过返回值确定写入量, 未写入的数据用户程
+          序会缓存起来, 后续再写入.
+        read buffer 也可能内容为空, 此时读操作也会阻塞, 直到 read buffer 中有足够的内容.
+          NIO 不会阻塞, 有多少读多少, 不够的后续继续读.
+    ACK
+        写缓冲数据拷贝到网卡后, 并不会立刻删除, 需要等待对方 ACK 过来后才会删除. 网络不好使,
+          写缓冲也会满
+    包头
+        数据每经过一层, 就回添加上一层对应的包头
+    速率
+        读缓冲满后, 网卡收到的消息会丢弃, 也并不会发 ACK. 此时 TCP 协议会调整动态窗口,
+          UDP 则会彻底丢失
+    ````
+
+---
+
 ## TCP UDP
 
 * TCP 协议作用
@@ -191,7 +232,41 @@
     ```
 
 * TCP 三次握手 四次挥手
+
+    **三次握手 四次挥手**<br>
     <img :src="$withBase('/image/network/tcp001.jpg')" alt="TCP 三次握手 四次挥手">
+
+    **三次握手**<br>
+    <img :src="$withBase('/image/network/tcp_connect001.gif')" alt="TCP 三次握手状态">
+    <img :src="$withBase('/image/network/tcp_connect002.gif')" alt="TCP 三次握手状态">
+    ```bash
+    半打开状态:
+        syn_sent
+        syn_rcvd
+    ```
+
+    **数据传输**<br>
+    <img :src="$withBase('/image/network/tcp_data001.gif')" alt="TCP 数据传输">
+    <img :src="$withBase('/image/network/tcp_data002.gif')" alt="TCP 数据传输">
+    ```bash
+    TCP 连接是双工的, 无论哪方都可以主动发起数据传输, 同时也都需要对方回复 ACK 确认
+    数据发送与接收双方需要协商合适的发送与接收速率, 即 TCP 窗口大小
+    接收方可以在接收到多个数据包后, 批量 ACK
+    ```
+
+    **四次挥手**<br>
+    <img :src="$withBase('/image/network/tcp_disconnect001.gif')" alt="TCP 四次挥手状态">
+    <img style="width: 40%" :src="$withBase('/image/network/tcp_disconnect002.gif')" alt="TCP 四次挥手状态">
+    ```bash
+    半关闭状态(主动关闭方发起关闭后, 并没有立刻关闭)
+    time_wait 状态
+        主动关闭的一方在回复完对方的挥手(发送 ACK)后, 进入的长期状态(标准时间为 4min, 可调),
+          然后才会进入 closed 状态, 释放套接字资源
+        作用是重传最有一个 ACK 报文, 确保对方收到. 如果对方未收到, 会重发 FIN 报文, 需要响应
+        此间, 网络上的残存报文传到时, 会被立刻丢弃
+        4 min = 2 MSL (最长报文寿命), 确保残留文件彻底消失, 不影响当前端口再次利用
+        四次挥手有可能中间两次合并为三次挥手, 主动关闭方会从 fin_wait_1 直接进入 time_wait
+    ```
 
     ```bash
     TCP 建立连接并初始化目标
@@ -209,10 +284,13 @@
         理论上发送的数据流不存在大小限制, 但由于缓冲区大小限制, 数据有可能截断
         数据到达有序
         一旦发生丢包, TCP 会将后续包缓存起来, 等前面的包重传并接收到后再继续发送
+        数据有重传也有去重
 
     使用场景
         When in doubt, use TCP.
     ```
+
+    TODO: TCP 心跳, 长连接, 短连接等
 
 * UDP
     ```bash
@@ -243,6 +321,29 @@
 <img :src="$withBase('/image/network/httprequest001.png')" alt="HTTP 请求">
 <img :src="$withBase('/image/network/httpresponse001.png')" alt="HTTP 响应">
 
+* 概念
+    ```bash
+    REQUEST:
+        <method> <request-url> <version>
+        <headers>
+
+        <entity-body>
+
+    RESPONSE:
+        <version> <status> <reason-phrase>
+        <headers>
+
+        <entity-body>
+    ```
+
+* Method
+
+    ```bash
+    GET
+    POST
+    ```
+
+
 * 响应状态码
     ```bash
     101 Switching Protocols : 服务器协议转换
@@ -253,23 +354,44 @@
     301 Moved Permanently : 所请求的页面已经转移至新的 url
     302 Found : 所请求的页面已经临时转移至新的 url
     303 See Other : 所请求的页面可在别的 url 下被找到
+    304 Not Modified : 资源未修改
 
     400 Bad Request : 服务器未能理解请求
-    401 Unauthorized : 被请求的页面需要用户名和密码
+    401 Unauthorized : 被请求的页面需要身份验证, 需要提供用户名和密码
+    403 Forbidden : 服务器理解请求, 但拒绝执行
+    404 Not Found : 请求失败, 请求所希望的资源未在服务器上发现
 
     500 Internal Server Error: 请求未完成, 服务器遇到不可预知的情况
     ```
 
----
+* HTTP 缓存
 
-## TCP 长连接
-
-* Socket 创建
     ```bash
-    Socket 其实是使用 <peer_addr:peer_port, local_addr:local_port> 四元组来区别不同
-      socket 实例.
-    一个客户端连接情况下, 有三个 socket
-        服务端负责监听 ServerSocket <*:*, *:9877> 可接受任何客户端和本地任何 IP
-        accept 返回 socket <127.0.0.1:client_port, 127.0.0.1:9877>
-        客户端 socket <server_ip:9877, 127.0.0.1:client_port>
+    相关概念:
+        新鲜度检测
+            发起请求时, 先对缓存资源进行判断是否可以直接使用
+            相关服务器响应报头字段
+                Cache-Control: max-age
+                Expire
+        再验证
+            发现缓存超时, 需要先去服务器查看该资源是否改变
+            相关条件请求头部字段
+                If-Modified-Since
+                If-None-Match
+                If-Unmodified-Since
+                If-Range
+                If-Match
+        再验证命中
+            服务器发现该 URL 资源没有发生变化, 返回 304 Not Modified, 并且不再返回该实体
+
+    流程:
+        1. 从接收到的请求中, 解析出 URL 和各个首部
+        2. 查询本地是否有混村副本可用
+        3. 如果有缓存, 则进行新鲜度检测, 如果缓存足够新鲜, 则使用缓存作为响应返回; 如果不新鲜
+           了, 则构造条件请求, 发往服务器验证. 如果没有缓存, 直接将请求发往服务器.
+        4. 从服务器返回的响应, 更新或是新增到缓存中
     ```
+
+* OAuth 认证授权协议
+
+* HTTPS

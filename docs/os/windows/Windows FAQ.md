@@ -38,4 +38,9 @@
     Ctrl + Q + Explorer : 左下角显示函数列表
     ```
 
+* 其他修改
+    - 注释取消斜体
+        `Microsoft VS Code\resources\app\extensions\theme-solarized-dark\themes`
+        打开 `solarized-dark-color-theme`, 将 `comment` 的 `italic` 删除为空
+
 ## 4. 其他

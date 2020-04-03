@@ -28,9 +28,23 @@
     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
     |                             data                              |
     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+    Sequence Number : 包序号, 解决网络包乱序问题
+    Acknowledgment Number : ACK 确认收到, 解决丢包问题
+    Window : 滑动窗口, 解决流量控制
+    TCP Flags : 包的类型, 用于操控 TCP 的状态机
     ```
 
+    <img :src="$withBase('/image/network/tcp_header_001.jpg')" alt="TCP Header">
+
     <img :src="$withBase('/image/network/tcp_basic_wireshark_002.png')" alt="TCP 与分层协议">
+
+* TCP 状态机
+
+    TCP 所谓的连接, 其实是通讯双方维护的一个 **连接状态**, 使其看起来好像连接一样.
+
+
+    <img :src="$withBase('/image/network/tcp_statemachine_001.png')" alt="TCP 状态机">
 
 * 三次握手
 
@@ -62,6 +76,31 @@
     Server 收到数据包, 检查 ack 是否为 K + 1, 标志位 ACK 是否为 1, 正确则连接成功.
     Client 和 Server 进入 ESTABLISHED 状态, 完成三次握手, 双方可以发送数据
     ```
+
+    - 注意事项
+
+    > 1. 建立连接时 SYN 超时
+    >> Server 回复 Client SYN-ACK 后没有收到 Client 回复的 ACK, 那么连接处于一个既没成
+       功, 也没失败的中间状态. 此时 Server 会每隔 1 2 4 8 16s 重发一次 SYN-ACK 数据包,
+       总计 1 + 2 + 4 + 8 + 16 + 32 = 63s 后, TCP 会断开连接
+
+    > 2. ISN (Inital Sequence Number)
+    >> ISN 为什么不能从 1 开始? 考虑到假设 Client 发出 10 个 segment 后, 网络断开, 此时
+       Client 重连, 又实用 1 为 ISN, 但之前的包到了, 此时会被当做新连接的包处理, Client
+       和 Server 端的 SYN 就对不上了. ISN 的周期是与一个每 4 微妙 +1 的逻辑时钟绑定, 直到
+       大于 2^32, 再从 0 开始, 所以 TCP segment 在网络上最大存活时间不会超过这一个周期
+       即 MSL <= 4.55h
+
+    > 3. MSL 与 TIME_WAIT
+    >> RFC 规定 MSL = 120s, Linux 设置为 30s.
+       从 TIME_WAIT -> CLOSED 状态, 超时时间设置为 2MSL. 主要是为了<br>
+       1). TIME_WAIT 确保有足够的时间让对方受到 ACK, 被动关闭方没有收到 ACK, 会触发重发
+           FIN, 来回时间满足 2MSL<br>
+       2). 有足够时间让此连接不与后面的连接混在一起
+
+    > 4. TIME_WAIT 数量太多
+    >> 大并发短连接时出现, 会消耗系统资源
+       解决方法待补充
 
     - 参考资料
 
@@ -106,3 +145,12 @@
     - 参考资料
 
         [TIME_WAIT 状态的产生原因及解决方法](https://blog.csdn.net/knowledgebao/article/details/84626238?depth_1-utm_source=distribute.pc_relevant.none-task&utm_source=distribute.pc_relevant.none-task)
+
+* TCP 传输
+
+    - TCP 重传机制
+---
+
+## FAQ
+
+1. SYN Flood 攻击

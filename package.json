@@ -1,7 +1,7 @@
 {
-  "name": "liteman",
+  "name": "developerhub",
   "version": "1.0.0",
-  "description": "LiteMan 开发服务中心",
+  "description": "Developerhub 开发服务中心",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

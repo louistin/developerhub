@@ -186,7 +186,9 @@ module.exports = {
                     collapsable: true,
                     children: [
                         "/network/tcpip/",
-                        "/network/tcpip/TCP 基础汇总"
+                        "/network/tcpip/TCP 协议",
+                        "/network/tcpip/UDP 协议",
+                        "/network/tcpip/DNS 协议"
                     ]
                 },
                 {

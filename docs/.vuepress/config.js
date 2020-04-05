@@ -36,8 +36,7 @@ module.exports = {
                             { text: 'Shell', link: '/cs/language/shell/' },
                             { text: 'Lua', link: '/cs/language/lua/' }
                         ]
-                    },
-
+                    }
                 ]
             },
             {
@@ -52,7 +51,13 @@ module.exports = {
                 items: [
                     { text: 'Socket', link: '/network/socket/' },
                     { text: 'TCP/IP', link: '/network/tcpip/' },
-                    { text: 'HTTP', link: '/network/http/' }
+                    { text: 'HTTP', link: '/network/http/' },
+                    {
+                        text: '读书笔记',
+                        items: [
+                            { text: 'TCP/IP 详解', link: '/network/note/tcpip-illustrated/' }
+                        ]
+                    }
                 ]
             },
             { text: '后端开发', link: '/server/' },
@@ -203,6 +208,23 @@ module.exports = {
                     collapsable: true,
                     children: [
                         "/network/http/"
+                    ]
+                },
+                {
+                    title: 'TCP/IP 详解',
+                    collapsable: true,
+                    children: [
+                        "/network/note/tcpip-illustrated/",
+                        "/network/note/tcpip-illustrated/01 概述",
+                        "/network/note/tcpip-illustrated/02 链路层",
+                        "/network/note/tcpip-illustrated/03 IP 网际协议",
+                        "/network/note/tcpip-illustrated/04 ARP 地址解析协议",
+                        "/network/note/tcpip-illustrated/05 RARP 逆地址解析协议",
+                        "/network/note/tcpip-illustrated/06 ICMP Internet 控制报文协议",
+                        "/network/note/tcpip-illustrated/07 Ping 程序",
+                        "/network/note/tcpip-illustrated/08 Traceroute 程序",
+                        "/network/note/tcpip-illustrated/09 IP 选路",
+                        "/network/note/tcpip-illustrated/10 动态选路协议"
                     ]
                 }
             ],

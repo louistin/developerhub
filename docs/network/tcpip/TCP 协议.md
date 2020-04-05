@@ -128,7 +128,7 @@
     <img :src="$withBase('/image/network/tcp_close_wireshark_003.png')" alt="TCP 第二三次挥手">
 
     ```bash
-    这里的第二次, 第三次挥手在一个数据包中
+    这里的第二次, 第三次挥手在一个数据包中 (如果此时 Server 还有数据要发送, 就不能合并)
     Server 收到 FIN 后, 发送一个 ACK 到 Client, 确认序列号 ack 为收到序列号 seq + 1,
       Server 进入 CLOSE_WAIT 状态
     Server 发送 FIN, 关闭 Server 到 Client 的数据传输, Server 进入 LAST_ACK 状态
@@ -149,6 +149,13 @@
 * TCP 传输
 
     - TCP 重传机制
+
+      ```bash
+      TCP 重传机制中 Timeout 设置
+          时间过长, 重发变慢, 效率低, 性能差
+          时间过短, 可能导致重发未丢失的包, 增加网络拥塞, 导致更多超时
+      
+      ```
 ---
 
 ## FAQ

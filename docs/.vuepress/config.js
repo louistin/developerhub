@@ -43,7 +43,13 @@ module.exports = {
                 text: '操作系统',
                 items: [
                     { text: 'Linux', link: '/os/linux/' },
-                    { text: 'Windows', link: '/os/windows/' }
+                    { text: 'Windows', link: '/os/windows/' },
+                    {
+                        text: '读书笔记',
+                        items: [
+                            { text: 'UNIX 环境高级编程', link: '/os/note/apue/' }
+                        ]
+                    }
                 ]
             },
             {
@@ -115,6 +121,34 @@ module.exports = {
                         "/os/windows/",
                         "/os/windows/Windows FAQ" // 你的md文件地址
                     ]
+                },
+                {
+                    title: 'UNIX 环境高级编程',
+                    collapsable: true,
+                    children: [
+                        "/os/note/apue/",
+                        "/os/note/apue/01 UNIX 基础知识",
+                        "/os/note/apue/02 UNIX 标准与实现",
+                        "/os/note/apue/03 文件IO",
+                        "/os/note/apue/04 文件与目录",
+                        "/os/note/apue/05 标准IO库",
+                        "/os/note/apue/06 系统数据文件和信息",
+                        "/os/note/apue/07 进程环境",
+                        "/os/note/apue/08 进程控制",
+                        "/os/note/apue/09 进程关系",
+                        "/os/note/apue/10 信号",
+                        "/os/note/apue/11 线程",
+                        "/os/note/apue/12 线程控制",
+                        "/os/note/apue/13 守护进程",
+                        "/os/note/apue/14 高级IO",
+                        "/os/note/apue/15 进程间通信",
+                        "/os/note/apue/16 网络IPC套接字",
+                        "/os/note/apue/17 高级进程间通信",
+                        "/os/note/apue/18 终端IO",
+                        "/os/note/apue/19 伪终端",
+                        "/os/note/apue/20 数据库函数",
+                        "/os/note/apue/21 与网络打印机通信"
+                    ]
                 }
 
             ],
@@ -148,7 +182,6 @@ module.exports = {
                         "/web/faq/HTTP 跨域处理"
                     ]
                 }
-
             ],
             '/opensource': [
                 {

@@ -47,7 +47,8 @@ module.exports = {
                     {
                         text: '读书笔记',
                         items: [
-                            { text: 'UNIX 环境高级编程', link: '/os/note/apue/' }
+                            { text: 'UNIX 环境高级编程', link: '/os/note/apue/' },
+                            { text: 'UNIX-LINUX 编程实践教程', link: '/os/note/uulp/' }
                         ]
                     }
                 ]
@@ -149,8 +150,16 @@ module.exports = {
                         "/os/note/apue/20 数据库函数",
                         "/os/note/apue/21 与网络打印机通信"
                     ]
+                },
+                {
+                    title: 'UNIX-LINUX 编程实践教程',
+                    collapsable: true,
+                    children: [
+                        "/os/note/uulp/",
+                        "/os/note/uulp/01 Unix 系统编程概述",
+                        "/os/note/uulp/02 用户 文件操作与联机帮助 - 编写 who 命令"
+                    ]
                 }
-
             ],
             '/web/': [
                 {

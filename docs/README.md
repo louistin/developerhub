@@ -10,5 +10,5 @@ features:
   details: 衣带渐宽终不悔, 为伊消得人憔悴.
 - title: 明天
   details: 众里寻他千百度, 蓦然回首, 那人却在灯火阑珊处.
-footer: Copyright © 2019 - 2020 LiteMan
+footer: Developerhub | Copyright © 2019 - present | Powered by VuePress | Louis
 ---

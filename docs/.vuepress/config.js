@@ -106,7 +106,8 @@ module.exports = {
                 "cms 布署文档",
                 "FFMPEG x265 Windows 编译",
                 "SpringBoot + Vue FAQ",
-                "Supervisor FAQ"
+                "Supervisor FAQ",
+                "Nginx 配置手册"
             ],
             '/os': [
                 {

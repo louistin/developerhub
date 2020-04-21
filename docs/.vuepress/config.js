@@ -17,12 +17,8 @@ module.exports = {
                 text: '计算机基础',
                 items: [
                     {
-                        text: '数据结构',
-                        link: '/cs/data-structure/'
-                    },
-                    {
-                        text: '算法',
-                        link: '/cs/algorithm/'
+                        text: '数据结构与算法',
+                        link: '/cs/dsa/'
                     },
                     {
                         text: '设计模式',
@@ -36,6 +32,12 @@ module.exports = {
                             { text: 'Java', link: '/cs/language/java/' },
                             { text: 'Shell', link: '/cs/language/shell/' },
                             { text: 'Lua', link: '/cs/language/lua/' }
+                        ]
+                    },
+                    {
+                        text: '读书笔记',
+                        items: [
+                            { text: '数据结构与算法: C 语言版', link: '/cs/note/dsac/' }
                         ]
                     }
                 ]
@@ -108,6 +110,15 @@ module.exports = {
                 "SpringBoot + Vue FAQ",
                 "Supervisor FAQ",
                 "Nginx 配置手册"
+            ],
+            '/cs/': [
+                {
+                    title: '数据结构与算法',
+                    collapsable: true,
+                    children: [
+                        "/cs/dsa/"
+                    ]
+                },
             ],
             '/os': [
                 {

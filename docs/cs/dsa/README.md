@@ -71,3 +71,123 @@
     * 线性表长度较大时, 难以确定存储空间和容量
     * 造成存储空间碎片
 * 线性表的链式存储结构
+  * 单链表
+
+    ```cpp
+    typedef struct Node {
+        ElemType data;      // 数据域
+        struct Node *next;  // 指针域
+    };
+
+    typedef struct Node *LinkList;
+    ```
+
+    * 循环链表
+      * 将单链表终端节点的指针域由空指针改为指向头结点
+  * 双向链表
+
+    ```cpp
+    typedef struct DulNode {
+        ElemType data;
+        struct DulNode *prior;  // 直接前驱指针
+        struct DulNode *next;   // 直接后继指针
+    };
+
+    typedef struct DulNode *DuLinkList;
+    ```
+
+    * 双向循环链表
+
+---
+
+## 04 - 栈与队列
+
+> 栈: 仅在表尾进行插入和删除操作的线性表, 先进后出<br>
+> 队列: 只允许在一端进行插入操作, 在另一端进行删除操作的线性表, 先进先出
+
+* 栈
+
+  ```cpp
+  // 栈的顺序存储结构
+  typedef int SElemType;
+  typedef struct SqStack {
+      SElemType data[MAXSIZE];
+      int top;          // 用于栈顶指针, -1 空栈
+  };
+
+  // 链栈
+  typedef struct StackNode {
+      SElemType data;
+      struct StackNode *next;
+  } StackNode, *LinkStackPtr;
+
+  typedef struct LinkStack {
+      LinkStackPtr top;
+      int count;
+  } LinkStack;
+  ```
+
+* 递归
+
+    ```cpp
+    #include <stdio.h>
+
+    int fbi(int num) {
+        if (num == 0) {
+            return 0;
+        } else if (num == 1) {
+            return 1;
+        }
+
+        return fbi(num - 1) + fbi(num - 2);
+    }
+
+    int main() {
+        for (int i = 0; i < 12; i++) {
+            printf("第 %d 月, 兔子数量为: %d.\n", i, fbi(i));
+        }
+
+        return 0;
+    }
+    ```
+
+* 栈的应用: 四则预案算表达式求值
+  * 后缀表达式
+
+    ```bash
+    9 + (3 - 1) * 3 + 10 / 2    # 中缀表达式
+    9 3 1 - 3 * + 10 2 / +      # 后缀表达式
+
+    将中缀表达式转化为后缀表达式(栈用来进出运算符号)
+    将后缀表达式进行运算得出结果(栈用来进出运算数字)
+    ```
+
+* 队列
+  * 头出尾插
+
+* 循环队列
+  * 头尾相接的顺序存储结构
+
+    ```bash
+    # rear 后保留一个空单元, 即认为已满
+    0    1    2    3    4 空         0    1    2 空 3    4
+    front                rear                  rear front
+
+    队列满的条件: (rear + 1) % QueueSize == front
+    队列长度计算: (rear - front + QueueSize) % QueueSize
+    ```
+
+* 队列的链式存储结构
+
+---
+
+## 05 - 串
+
+> 由零个或多个字符组成的有限序列
+
+* 串的存储结构
+  * 顺序存储(更好)
+  * 链式存储
+* 模式匹配算法
+  * 效率太低
+* KMP 模式匹配算法

@@ -181,7 +181,7 @@
 
 ---
 
-## 05 - 串
+## 05 - 串 String
 
 > 由零个或多个字符组成的有限序列
 
@@ -191,3 +191,37 @@
 * 模式匹配算法
   * 效率太低
 * KMP 模式匹配算法
+
+---
+
+## 06 - 树 Tree
+
+> 树是 n(n >= 0) 个结点的有限集. n = 0 时称为空树.<br>
+> 在任何一个非空树中:<br>
+> 1) 有且只有一个特定的称为根 Root 的结点<br>
+> 2) 当 n > 1 时, 其余结点可分为 m (m > 0) 个互不相交的有限集 T1, T2, ... Tm, 其中每个
+> 集合本身又是一棵树, 并且称为根的子树 SubTree
+
+* 树
+  * 结点拥有的子树树称为结点的度 Degree
+    * 度为 0 的结点称为叶节点 Leaf
+    * 度不为 0 的结点称为分支结点
+  * 树的度是树内各结点的度的最大值
+
+* 树的存储结构
+  * 双亲表示法
+
+    ```cpp
+    #define MAX_TREE_SIZE   100
+    typedef int TElemType;
+    typedef struct {
+        TElemType data;   // 结点数据
+        int parent;       // parent 位置(数组下标)
+    } PTNode;
+
+    typedef struct {
+      PTNode nodes[MAX_TREE_SIZE];
+      int r;      // 根的位置, 根结点为 -1
+      int n;      // 结点数
+    } PTree;
+    ```

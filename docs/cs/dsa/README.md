@@ -213,7 +213,8 @@
 
     ```cpp
     #define MAX_TREE_SIZE   100
-    typedef int TElemType;
+    typedef int TElemType
+
     typedef struct {
         TElemType data;   // 结点数据
         int parent;       // parent 位置(数组下标)
@@ -225,3 +226,188 @@
       int n;      // 结点数
     } PTree;
     ```
+
+  * 孩子表示法
+    * 多重链表表示法
+      * 每个结点有多个指针域, 每个指针指向一棵子树的根结点
+
+    ```cpp
+    #define MAX_TREE_SIZE   100
+    typedef int TElemType
+
+    // 孩子结点
+    typedef struct CTNode {
+      int child;      // 存储某个结点在表头数组中的下标
+      struct CTNode *next;  // 指向某结点的下一个孩子结点
+    } *ChildPtr;
+
+    // 表头结构
+    typedef struct {
+      TElemType data;       // 结点数据
+      ChildPtr firstchild;  // 指向结点的孩子链表
+    } CTBox;
+
+    // 树结构
+    typedef struct {
+      CTBox nodes[MAX_TREE_SIZE];
+      int r;
+      int n;
+    } CTree;
+    ```
+
+  * 孩子兄弟表示法
+
+    ```cpp
+    typedef struct CSNode {
+      TElemType data;
+      struct CSNode *firstchild;
+      struct CSNode *rightchild;
+    } CSNode, *CSTree;
+    ```
+
+* 二叉树
+  * 斜树
+  * 满二叉树
+  * 完全二叉树
+
+* 二叉树的存储结构
+  * 顺序存储结构
+    * 适用于完全二叉树
+  * 二叉链表
+
+    ```cpp
+    typedef struct BiTNode {
+        TElemType data;
+        struct BiTNode *lchild, *rchild;    // 左右孩子指针
+    } BiTNode, *BiTree;
+    ```
+
+* 二叉树的遍历
+  * 前序遍历
+    * 若二叉树为空, 则空操作返回, 否则先访问根结点, 然后前序遍历左子树, 再前序遍历右子树
+
+    ```cpp
+    void PreOrderTraverse(BiTree T) {
+        if (T == NULL) {
+            return;
+        }
+
+        printf("%s", T->data);
+        PreOrderTraverse(T->lchild);
+        PreOrderTraverse(T->rchild);
+    }
+    ```
+
+  * 中序遍历
+    * 若树为空, 则空操作返回, 否则从根结点开始(不是首先访问根结点), 中序遍历根结点的左子树,
+      然后访问根结点, 最后中序遍历右子树
+
+    ```cpp
+    void InOrderTraverse(BiTree T) {
+        if (T == NULL) {
+            return;
+        }
+
+        InOrderTraverse(T->lchild);
+        printf("%s", T->data);
+        InOrderTraverse(T->rchild);
+    }
+    ```
+
+  * 后序遍历
+    * 若树为空, 则空操作返回, 否则从左到右先叶子后结点的方式访问左右子树, 最后访问根结点
+
+    ```cpp
+    void PostOrderTraverse(BiTree T) {
+        if (T == NULL) {
+            return;
+        }
+
+        PostOrderTraverse(T->lchild);
+        PostOrderTraverse(T->rchild);
+        printf("%s", T->data);
+    }
+    ```
+
+  * 层序遍历
+    * 若树为空, 则空操作返回, 否则从树的第一层, 也就是根结点开始访问, 从上而下逐层遍历, 在同
+      一层, 按从左到右的顺序对结点逐个访问
+
+* 二叉树的建立
+
+    ```cpp
+    // 按照前序方式输入二叉树结点的值, 每个结点值为一个字符
+    // # 表示空树, 需要将原二叉树填充 # 扩展为完全二叉树(每个结点的空指针都引出一个虚结点)
+    // 如 AB#D##C##
+    void CreateBiTree(BiTree *T) {
+        TElemType ch;
+        scanf("%c", &ch);
+        if (ch == '#') {
+            *T = NULL;
+        } else {
+            *T = (BiTree)malloc(sizeof(BiTNode));
+            if (!*T) {
+                exit(OVERFLOW);
+            }
+
+            (*T)->data = ch;    // 生成根结点
+            CreateBiTree(&(*T)->lchild);    // 构造左子树
+            CreateBiTree(&(*T)->rchild);    // 构造右子树
+        }
+    }
+    ```
+
+* 线索二叉树
+  * 线索化的实质是将二叉链表中的空指针改为指向前驱或后继的线索. 线索化的过程就是在遍历的过程
+      中修改空指针的过程.
+  * 线索二叉树的操作实际上就是操作一个双向链表结构
+
+    ```cpp
+    // Link == 0 表示指向左右孩子指针
+    // Thread == 0 表示指向前驱或后继的线索
+    typedef enum {Link, Thread} PointerTag;
+
+    typedef struct BiThrNode {
+        TElemType data;             // 结点数据
+        struct BiThrNode *lchild, *rchild;  // 左右孩子指针
+        PointerTag LTag;
+        PointerTag RTag;    // 左右标志
+    } BiThrNode, *BiThrTree;
+
+    // 全局变量, 指向刚刚访问过的结点
+    BiThrTree pre;
+    // 中序遍历进行中序线索化
+    void InThreading(BiThrTree p) {
+        if (p) {
+            InThreading(p->lchild);
+            if (!p->lchild) {
+                p->LTag = Thread;   // 前驱线索
+                p->lchild = pre;    // 左孩子指针指向前驱
+            }
+
+            if (!p->rchild) {
+                pre->RTag = Thread; // 后继线索
+                pre->rchild = p;    // 前驱右孩子指针指向后继(当前结点 p)
+            }
+
+            pre = p;                // 保持 pre 指向 p 的前驱
+            InThreading(p->rchild);
+        }
+    }
+    ```
+
+* 树, 森林与二叉树的转换
+  * 树转换为二叉树
+    1. 加线. 所有兄弟结点之间加一条连线
+    2. 去线. 对树中每个结点, 只保留它与第一个孩子结点的连线, 删除它与其他孩子结点之间的连线
+    3. 层次调整. 以树的根结点为轴心, 将整棵树顺时针旋转一定的角度, 使之结构层次分明. 第一个
+       孩子是二叉树结点的左孩子, 兄弟转换过来的孩子是结点的右孩子
+  * 森林转换为二叉树
+    1. 把每个树转换为二叉树
+    2. 第一棵二叉树不动, 从第二棵二叉树开始依次把后一棵二叉树的根结点作为前一棵二叉树的根结点
+       的右孩子, 用线连起来. 当所有二叉树连接起来后就得到了由森林转换来的二叉树
+
+* 赫夫曼树
+  * 带权路径长度 WPL 最小的二叉树叫做赫夫曼树
+  * 赫夫曼编码
+    * 前缀编码: 要设计长短不等的编码, 必须是任一字符的编码都不是另一个字符的编码的前缀

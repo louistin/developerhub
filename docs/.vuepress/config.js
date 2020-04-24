@@ -25,6 +25,10 @@ module.exports = {
                         link: '/cs/design-pattern/'
                     },
                     {
+                        text: '数据库',
+                        link: '/cs/database/'
+                    },
+                    {
                         text: '编程语言',
                         items: [
                             { text: 'C', link: '/cs/language/c/' },
@@ -117,6 +121,13 @@ module.exports = {
                     collapsable: true,
                     children: [
                         "/cs/dsa/"
+                    ]
+                },
+                {
+                    title: '数据库',
+                    collapsable: true,
+                    children: [
+                        "/cs/database/"
                     ]
                 },
             ],

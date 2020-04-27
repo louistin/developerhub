@@ -473,3 +473,85 @@
 
         **有向网图邻接矩阵**<br>
         <img :src="$withBase('/image/cs/dsa/readme/07_graph_adjacency_matrix_002.png')" alt="有向网图邻接矩阵">
+
+    * 邻接矩阵
+      * 边数相对顶点较少时, 存在存储空间浪费
+
+        **邻接矩阵**<br>
+        <img :src="$withBase('/image/cs/dsa/readme/07_graph_adjacency_matrix_003.png')" alt="邻接矩阵">
+
+
+        ```cpp
+        typedef char VertexType;        // 顶点类型
+        typedef int EdgeType;           // 权值类型
+        #define MAXVEX      100         // 最大顶点数
+        #define INFINITY    65535       // 表示无穷大
+
+        typedef struct {
+            VertexType vexs[MAXVEX];        // 顶点表
+            EdgeType arc[MAXVEX][MAXVEX];   // 邻接矩阵/边表
+            int numVertexes;    // 顶点数
+            int numEdges;       // 边数
+        } MGraph;
+        ```
+
+    * 邻接表 Adjacency List
+      * 数组与链表相结合的存储方法
+
+        **邻接表**<br>
+        <img :src="$withBase('/image/cs/dsa/readme/07_graph_adjacency_matrix_004.png')" alt="邻接表">
+
+        ```cpp
+        typedef char VertexType;
+        typedef int EdgeType;
+
+        typedef struct EdgeNode {
+            int adjvex;
+            EdgeType weight;
+            struct EdgeNode *next;
+        } EdgeNode;
+
+        typedef struct VertexNode {
+            VertexType data;
+            EdgeNode *firstedge;
+        } VertexNode, AdjList[MAXVEX];
+
+        typedef struct {
+            AdjList adjList;
+            int numVertexes, numEdges;
+        } GraphAdjList;
+        ```
+
+      * 逆邻接表
+
+        **逆邻接表**<br>
+        <img :src="$withBase('/image/cs/dsa/readme/07_graph_adjacency_matrix_005.png')" alt="逆邻接表">
+
+
+    * 十字链表 Orthogonal List
+      * 将邻接表和逆邻接表整合在一起, 可以容易找到以 Vi 为弧尾和弧头的弧
+
+        **十字接表**<br>
+        > 实线为邻接表, 虚线为逆邻接表
+
+        <img :src="$withBase('/image/cs/dsa/readme/07_graph_orthogonal_list_001.png')" alt="十字接表">
+
+    * 邻接多重表
+
+        **邻接多重表**<br>
+        <img :src="$withBase('/image/cs/dsa/readme/07_graph_adjacency_matrix_006.png')" alt="邻接多重表">
+
+        ```
+        ivex jvex: 与某条边依附的两个顶点在顶点表中的下标
+        ilink: 指向依附顶点 ivex 的下一条边
+        jlink: 指向依附顶点 jvex 的下一条边
+
+        理解上图, 可以将箭头指向处的jvex 替换为起点处的ivex 就可以理解了
+        ```
+
+    * 边集数组
+
+* 图的遍历
+  * 深度优先遍历 Depth First Search
+  *
+  * 广度优先遍历 Breadth First Search

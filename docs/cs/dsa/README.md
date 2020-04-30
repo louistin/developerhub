@@ -553,5 +553,18 @@
 
 * 图的遍历
   * 深度优先遍历 Depth First Search
-  *
+
+    **深度优先遍历**<br>
+    <img :src="$withBase('/image/cs/dsa/readme/07_graph_dfs_001.png')" alt="深度优先遍历">
+
   * 广度优先遍历 Breadth First Search
+
+    **广度优先遍历**<br>
+    <img :src="$withBase('/image/cs/dsa/readme/07_graph_bfs_001.png')" alt="广度优先遍历">
+
+* 最小生成树 Minimum Cost Spanning Tree
+> 构造联通网的最小代价生成树
+
+* Prim 算法
+
+* Kruskal 算法

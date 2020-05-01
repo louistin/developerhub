@@ -125,6 +125,8 @@ hostnamectl set-hostname louis
 
     # 修改端口号 /etc/sysconfig/jenkins
     # 初始密码 /var/lib/jenkins/secrets/initialAdminPassword
+    # 输入密码后进入插件安装选择界面, 此时不要点, 先配置下面的内容, 不要重启, 替换完毕后再点
+    # 选择安装默认插件
 
     # 解决插件安装慢问题
     http://ip:port/pluginManager/advanced
@@ -139,7 +141,9 @@ hostnamectl set-hostname louis
     # 配置
     # Plugin Manager 安装 Github 插件
     # Global Tool Configuration 配置 git (安装的高版本) path: /usr/local/git/bin
-
+    # 安装 NodeJS 插件, 配置 node path
+    # 安装 workspace cleanup, Build Environment -> Delete workspace before build starts
+    # NodeJS 配置最终解决方法是不适用系统node 而是使用插件安装
     ```
 
 7. NodeJS

@@ -39,9 +39,6 @@ hostnamectl set-hostname louis
         maven \
         tcl tcl-devel \
 
-
-
-
     pip install mycli
     ```
 
@@ -196,4 +193,12 @@ hostnamectl set-hostname louis
     # 编译安装
     ./configure --prefix=/opt/openresty --with-luajit
     gmake && gmake install
+    ```
+
+11. docker
+    ```bash
+    yum install -y yum-utils device-mapper-persistent-data lvm2
+    yum-conf ig-manager --add-repo https://download.docker.corn/linux/centos/docker-ce.repo
+    yum install -y docker-ce
+    systemctl start docker
     ```

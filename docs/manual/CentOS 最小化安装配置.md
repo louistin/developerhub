@@ -193,6 +193,27 @@ hostnamectl set-hostname louis
     # 编译安装
     ./configure --prefix=/opt/openresty --with-luajit
     gmake && gmake install
+
+    # 配置 nginx 开机启动
+    /usr/lib/systemd/system/nginx.service
+
+    systemctl daemon-reload
+    systemctl start nginx
+    systemctl enable nginx
+    ```
+    ```bash
+    # 开机启动配置文件
+    [Service]
+    Type=forking
+    PIDFile=/opt/openresty/nginx/logs/nginx.pid
+    ExecStartPre=/opt/openresty/nginx/sbin/nginx -c /opt/openresty/nginx/conf/nginx.conf -t
+    ExecStart=/opt/openresty/nginx/sbin/nginx -c /opt/openresty/nginx/conf/nginx.conf
+    ExecReload=/bin/kill -s HUP $MAINPID
+    ExecStop=/bin/kill -s QUIT $MAINPID
+    PrivateTmp=true
+
+    [Install]
+    WantedBy=multi-user.targetnginx.service
     ```
 
 11. docker

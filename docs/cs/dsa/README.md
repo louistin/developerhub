@@ -480,7 +480,6 @@
         **邻接矩阵**<br>
         <img :src="$withBase('/image/cs/dsa/readme/07_graph_adjacency_matrix_003.png')" alt="邻接矩阵">
 
-
         ```cpp
         typedef char VertexType;        // 顶点类型
         typedef int EdgeType;           // 权值类型
@@ -568,3 +567,47 @@
 * Prim 算法
 
 * Kruskal 算法
+
+---
+
+## 08 - 查找
+
+* 查找概论
+  * 静态查找表 Static Search Table
+    * 只做查找操作
+  * 动态查找表 Dynamic Search Table
+    * 在查找过程中同时插入查找表中不存在的数据元素, 或从表中删除已存在的某个元素
+
+* 顺序表查找 Sequential Search
+  * 属于静态表查找
+  * 从表中第一个(最后一个)记录开始, 逐个进行记录的关键字和给定值比较查找(就是for 循环)
+  * 优化: 有哨兵顺序查找
+
+    ```cpp
+    // 避免了 for 循环中每次的 i 是否越界比较操作,
+    int Sequential_Search(int *a, int n, int key) {
+      int i;
+      a[0] = key;   // 将a[0]设置为关键字值, 即哨兵
+      i = n;
+      while (a[i] != key) {
+        i--;
+      }
+
+      return i;
+    }
+    ```
+
+* 有序表查找
+  * 二分查找 Binary Search
+    * 线性表中的记录必须关键码有序, 线性表必须采用顺序存储
+  * 插值查找 Interpolation Search
+    * 根据要查的关键字 key 与查找表中最大最小记录的关键字比较后的查找方法
+    * 插值计算公式 `(key - a[low]) / a[high] - a[low]`
+  * 斐波那契查找 Fibonacci Search
+
+* 线性索引查找
+  * 索引, 把一个关键字与它对应的记录相关联的过程
+    * 稠密索引, 在线性索引中, 将数据集中的每个记录对应一个索引项(索引项按关键码有序排列)
+    * 分块索引
+      * 对于分块有序的数据集, 将每块对应一个索引项
+      * 块内无序, 块间有序

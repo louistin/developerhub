@@ -611,3 +611,53 @@
     * 分块索引
       * 对于分块有序的数据集, 将每块对应一个索引项
       * 块内无序, 块间有序
+
+        **分块索引**<br>
+        <img :src="$withBase('/image/cs/dsa/readme/08_001.png')" alt="分块索引">
+
+    * 倒排索引 inverted index
+      * 索引表, 索引项通用结构
+        * 次关键码
+        * 记录号表
+        * 记录号表存储具有相同次关键字的所有记录的记录号
+        * 不是由记录来确定属性值, 而是由属性值来确定记录的位置
+        * 搜索引擎关键字检索
+
+* 二叉树排序
+  * 二叉排序树 Binary Sort Tree
+    * 若左子树不空, 则左子树上所有结点的值均小于它的根结构的值
+    * 若右子树不空, 则右子树上所有结点的值均大于它的根结点的值
+    * 它的左右子树也分别为二叉排序树
+    * 提高查找, 插入和删除关键字的速度
+
+      **二叉排序树**<br>
+      <img :src="$withBase('/image/cs/dsa/readme/08_binary_sort_tree.png')" alt="二叉排序树">
+
+      ```cpp
+      typedef struct BiTNode {
+          int data;
+          struct BiTNode *lchild, *rchild;
+      } BiTNode, *BiTree;
+      ```
+
+* 平衡二叉树 High-Balanced Binary Search Tree (AVL 树)
+  * 二叉排序树的每一个节点的左子树和右子树的高度差最多等于 1
+  * 可以为空树
+  * 二叉树上结点的左子树深度减去右子树深度的值成为平衡因子BF(Balance Factor)
+  * 最小不平衡子树
+    * 距离插入结点最近的, 且平衡因子绝对值大于 1 的结点为根的子树
+  * 平衡二叉树的实现原理
+    * 在构建二叉排序树的过程中, 每当插入一个结点时, 先检查是否因插入而破坏了树的平衡性, 若是
+      则找出最小不平衡子树. 在保持二叉排序树特性的前提下, 调整最小不平衡子树中各个结点之间的
+      链接关系, 进行相应的旋转, 使之成为新的平衡子树.
+
+      ```cpp
+      typedef struct BiTNode {
+          int data;
+          int bf;           // 结点平衡因子
+          struct BiTNode *lchild, *rchild;
+      } BiTNode, *BiTree;
+      ```
+
+* 多路查找树 multi-way search tree
+  * 每一个结点的孩子数可以多于两个, 且每个结点处可以存储多个元素

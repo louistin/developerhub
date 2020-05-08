@@ -306,6 +306,7 @@ module.exports = {
     plugins: [
         ['vuepress-plugin-reading-time'],
         ['vuepress-plugin-reading-progress'],
-        ['@vuepress/back-to-top']
+        ['@vuepress/back-to-top'],
+        ['vuepress-plugin-code-copy', true]
     ]
 };

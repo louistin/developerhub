@@ -304,7 +304,7 @@ module.exports = {
         smoothScroll: true,
         // 文档更新时间：每个文件git最后提交的时间,
         lastUpdated: '最后更新',
-        
+
         displayAllHeaders: false, // 默认值：false
 
         // 假定是 GitHub. 同时也可以是一个完整的 GitLab URL
@@ -328,18 +328,18 @@ module.exports = {
         'vuepress-plugin-reading-time',
         'vuepress-plugin-reading-progress',
         '@vuepress/back-to-top',
-        //'@vuepress/last-updated',
-        [
-            '@vuepress/last-updated',
-            {
-              transformer: (timestamp, lang) => {
-                // Don't forget to install moment yourself
-                const moment = require('moment')
-                moment.locale(lang)
-                return moment(timestamp).fromNow()
-              }
-            }
-        ],
+        '@vuepress/last-updated',
+        // [
+        //     '@vuepress/last-updated',
+        //     {
+        //       transformer: (timestamp, lang) => {
+        //         // Don't forget to install moment yourself
+        //         const moment = require('moment')
+        //         moment.locale(lang)
+        //         return moment(timestamp).fromNow()
+        //       }
+        //     }
+        // ],
         'vuepress-plugin-code-copy',
         'vuepress-plugin-seo',
         // 页面滚动时自动激活侧边栏

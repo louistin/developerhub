@@ -1,4 +1,5 @@
 # 数据结构与算法
+> <p align="left" style="font-family:Arial;font-size:80%;color:#C0C0C0">全文字数 {{ $page.readingTime.words}} words &nbsp;|&nbsp; 阅读时间 {{Math.ceil($page.readingTime.minutes)}} mins</p><br>
 
 > 以大话数据结构为参考书籍对数据结构与算法做一个较全面的认知(其实本书看着真烦>_<)
 

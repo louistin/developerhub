@@ -772,4 +772,94 @@
 
 * 冒泡排序 Bubble Sort
   * 基本思想: 两两比较相邻记录的关键字, 如果反序则交换, 直到没有反序的记录为止
-  * 
+
+  ```cpp
+  #include <stdio.h>
+  #include <string.h>
+  #include <stdlib.h>
+
+  #define MAXSIZE     10
+
+  typedef struct {
+      int r[MAXSIZE + 1];
+      int length;
+  } sq_list;
+
+  static void print_list(sq_list *list) {
+      for (int i = 0; i <= list->length; i++) {
+          printf("%d ", list->r[i]);
+      }
+
+      printf("\n");
+  }
+
+  static void swap(sq_list *list, int i, int j) {
+      int temp = list->r[i];
+      list->r[i] = list->r[j];
+      list->r[j] = temp;
+  }
+
+  static void bubble_sort_v0(sq_list *list) {
+      for (int i = 1; i < list->length; i++) {
+          for (int j = i + 1; j <= list->length; j++) {
+              print_list(list);
+              if (list->r[i] > list->r[j]) {
+                  printf("swap %d %d\n", list->r[i], list->r[j]);
+                  swap(list, i, j);
+              }
+          }
+      }
+
+      print_list(list);
+  }
+
+  static void bubble_sort_v1(sq_list *list) {
+      for (int i = 1; i < list->length; i++) {
+          for (int j = list->length - 1; j >= i; j--) {
+              print_list(list);
+              if (list->r[j] > list->r[j + 1]) {
+                  printf("swap %d %d\n", list->r[j], list->r[j + 1]);
+                  swap(list, j, j + 1);
+              }
+          }
+      }
+
+      print_list(list);
+  }
+
+  // 使用 flag 优化遍历过程, 当后续部分已经有序时, 不再继续遍历
+  static void bubble_sort_v2(sq_list *list) {
+      int flag = 1;
+      for (int i = 1; i < list->length && flag == 1; i++) {
+          flag = 0;
+
+          for (int j = list->length - 1; j >= i; j--) {
+              print_list(list);
+              if (list->r[j] > list->r[j + 1]) {
+                  printf("swap %d %d\n", list->r[j], list->r[j + 1]);
+                  swap(list, j, j + 1);
+                  flag = 1;
+              }
+          }
+      }
+
+      print_list(list);
+  }
+
+  int main() {
+      sq_list *list = (sq_list *)malloc(sizeof(sq_list));
+      memset(list, 0, sizeof(sq_list));
+      list->length = MAXSIZE;
+      int array[MAXSIZE] = {4, 1, 5, 8, 0, 3, 7, 9, 6, 2};
+
+      list->r[0] = -1;
+
+      for (int i = 0; i < MAXSIZE; i++) {
+          list->r[i + 1] = array[i];
+      }
+
+      bubble_sort_v1(list);
+
+      return 0;
+  }
+  ```

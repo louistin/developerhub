@@ -329,17 +329,6 @@ module.exports = {
         'vuepress-plugin-reading-progress',
         '@vuepress/back-to-top',
         '@vuepress/last-updated',
-        // [
-        //     '@vuepress/last-updated',
-        //     {
-        //       transformer: (timestamp, lang) => {
-        //         // Don't forget to install moment yourself
-        //         const moment = require('moment')
-        //         moment.locale(lang)
-        //         return moment(timestamp).fromNow()
-        //       }
-        //     }
-        // ],
         'vuepress-plugin-code-copy',
         'vuepress-plugin-seo',
         // 页面滚动时自动激活侧边栏

@@ -298,15 +298,52 @@ module.exports = {
             '/about/': [
                 ""
             ]
-
         },
         sidebarDepth: 3,
-        lastUpdated: 'Last Updated',
+        // 页面滚动
+        smoothScroll: true,
+        // 文档更新时间：每个文件git最后提交的时间,
+        lastUpdated: '最后更新',
+        displayAllHeaders: false, // 默认值：false
+
+        // 假定是 GitHub. 同时也可以是一个完整的 GitLab URL
+        repo: 'https://github.com/louistin/blog.liteman.git',
+        // 自定义仓库链接文字。默认从 `blog.liteman.repo` 中自动推断为
+        // "GitHub"/"GitLab"/"Bitbucket" 其中之一，或是 "Source"。
+        repoLabel: 'GitHub',
+        // 以下为可选的编辑链接选项
+        // 假如你的文档仓库和项目本身不在一个仓库：
+        docsRepo: 'https://github.com/louistin/blog.liteman',
+        // 假如文档不是放在仓库的根目录下：
+        docsDir: 'docs',
+        // 假如文档放在一个特定的分支下：
+        docsBranch: 'master',
+        // 默认是 false, 设置为 true 来启用
+        editLinks: true,
+        // 默认为 "Edit this page"
+        editLinkText: '在 GitHub 上编辑此页'
     },
     plugins: [
-        ['vuepress-plugin-reading-time'],
-        ['vuepress-plugin-reading-progress'],
-        ['@vuepress/back-to-top'],
-        ['vuepress-plugin-code-copy', true]
+        'vuepress-plugin-reading-time',
+        'vuepress-plugin-reading-progress',
+        '@vuepress/back-to-top',
+        '@vuepress/last-updated',
+        'vuepress-plugin-code-copy',
+        'vuepress-plugin-seo',
+        // 页面滚动时自动激活侧边栏
+        ['@vuepress/active-header-links', {
+            sidebarLinkSelector: '.sidebar-link',
+            headerAnchorSelector: '.header-anchor'
+        }],
+        [
+            '@vuepress/pwa',
+            {
+              serviceWorker: true,
+              updatePopup: {
+                message: '当前网站内容已更新!',
+                buttonText: '刷新',
+              }
+            }
+        ]
     ]
 };

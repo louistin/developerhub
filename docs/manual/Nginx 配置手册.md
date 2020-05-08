@@ -1,4 +1,6 @@
 # Nginx 配置手册
+---
+> <p align="left" style="font-family:Arial;font-size:80%;color:#C0C0C0">更新时间 {{ $page.lastUpdated }} &nbsp;|&nbsp; 全文字数 {{ $page.readingTime.words}} words &nbsp;|&nbsp; 阅读时间 {{Math.ceil($page.readingTime.minutes)}} mins</p>
 
 ## Nginx 反向代理
 
@@ -60,5 +62,4 @@
             }
         }
     }
-
     ```

@@ -36,7 +36,7 @@ jobs:
     - name: Delpoy louistin.github.io/master
       uses: peaceiris/actions-gh-pages@v2
       env:
-        ACCCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+        ACTIONS_DEPLOY_KEY: ${{ secrets.ACTIONS_DEPLOY_KEY }}
         EXTERNAL_REPOSITORY: louistin/louistin.github.io
         PUBLISH_BRANCH: master
         PUBLISH_DIR: docs/.vuepress/dist

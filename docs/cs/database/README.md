@@ -7,6 +7,7 @@
 # 确保数据都写入磁盘
 FLUSH TABLES;
 
+# shell 下执行
 # 备份整个数据库
 mysqldump -u root -h host -p dbname > backdb.sql
 # 备份某个表
@@ -14,8 +15,9 @@ mysqldump -u root -h host -p dbname tbname1, tbname2 > backdb.sql
 # 备份多个数据库
 mysqldump -u root -h host -p --databases dbname1, dbname2 > backdb.sql
 
+# 以下两种选择其一
 # 执行前先创建 dbname, mysqldump 创建的备份文件执行时无需 dbname 参数
 mysql -u root -p [dbname] < backup.sql
 # 选择对应的数据库后执行
-source backup.sql;
+source /path/backup.sql;
 ```

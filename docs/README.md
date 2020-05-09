@@ -1,7 +1,7 @@
 ---
 home: true
 heroImage: /image/logo.png
-actionText: Developer →
+actionText: Developer 🚩
 actionLink: /manual/
 features:
 - title: 昨天

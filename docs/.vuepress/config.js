@@ -7,7 +7,8 @@ module.exports = {
     port: 2560,
     base: '/blog/',
     markdown: {
-        lineNumbers: true // 代码块显示行号
+        lineNumbers: true, // 代码块显示行号
+        toc: true
     },
     themeConfig: {
         nav: [

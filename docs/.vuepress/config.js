@@ -5,7 +5,7 @@ module.exports = {
         ['link', { rel: 'icon', href: '/image/chrome.png' }]
     ],
     port: 2560,
-    base: '/blog/',
+    base: '/',
     markdown: {
         lineNumbers: true, // 代码块显示行号
         toc: true

@@ -10,5 +10,8 @@ features:
   details: 衣带渐宽终不悔, 为伊消得人憔悴.
 - title: 明天
   details: 众里寻他千百度, 蓦然回首, 那人却在灯火阑珊处.
-footer: Developerhub | Copyright © 2019 - present | Powered by VuePress | Louis
+footer: Developerhub © 2019 - 2020 💖 louis.tianlu@gmail.com
 ---
+---
+<p align="center" style="font-size:100%;color:#C0C0C0">不要高估一天的收获, 不要低估每一天的收获.</p>
+

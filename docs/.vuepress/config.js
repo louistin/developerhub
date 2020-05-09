@@ -304,6 +304,7 @@ module.exports = {
         smoothScroll: true,
         // 文档更新时间：每个文件git最后提交的时间,
         lastUpdated: '最后更新',
+
         displayAllHeaders: false, // 默认值：false
 
         // 假定是 GitHub. 同时也可以是一个完整的 GitLab URL

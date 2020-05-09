@@ -17,11 +17,11 @@ make && make install
     include=/usr/local/etc/php-fpm.d/*.conf
 
 /usr/local/etc/php-fpm.d/www.conf
-    user = www                                                                      
-    group = www                                                       
-    listen = 127.0.0.1:9000                                    
-    listen.owner = www                                                              
-    listen.group = www                                                              
+    user = www
+    group = www
+    listen = 127.0.0.1:9000
+    listen.owner = www
+    listen.group = www
     listen.mode = 0660
 
 # 启动 php-fpm, 可以看到监听9000端口
@@ -38,46 +38,46 @@ chown www:www wiki -R
 
 ```
 # conf 配置参考
-server {                                                                        
-    listen 1080;                                                                
-    #server_name liteman.xyz;                                                   
-    server_name 127.0.0.1;                                                      
-                                                                                
-# Maximum file upload size is 4MB - change accordingly if needed                
-    client_max_body_size 4M;                                                    
-    client_body_buffer_size 128k;                                               
-                                                                                
-    root /opt/openresty/nginx/html/liteman/wiki;                                
-    index doku.php;                                                             
-                                                                                
-#Remember to comment the below out when you're installing, and uncomment it when done.
-#    location ~ /(conf/|bin/|inc/|install.php) { deny all; }                    
-                                                                                
-#Support for X-Accel-Redirect                                                   
-    location ~ ^/data/ { internal ; }                                           
-                                                                                
-    location ~ ^/lib.*\.(js|css|gif|png|ico|jpg|jpeg)$ {                        
-        expires 365d;                                                           
-    }                                                                           
-                                                                                
-    location / { try_files $uri $uri/ @wiki; }                                  
-    #location / { try_files $uri $uri/ =404; }                                  
-                                                                                
-    location @wiki {                                                            
-# rewrites "doku.php/" out of the URLs if you set the userwrite setting to .htaccess in dokuwiki config page
-        rewrite ^/_media/(.*) /lib/exe/fetch.php?media=$1 last;                 
-        rewrite ^/_detail/(.*) /lib/exe/detail.php?media=$1 last;               
-        rewrite ^/_export/([^/]+)/(.*) /doku.php?do=export_$1&id=$2 last;       
-        rewrite ^/(.*) /doku.php?id=$1&$args last;                              
-    }                                                                           
-                                                                                
-    location ~ \.php$ {                                                         
-        try_files $uri $uri/ /doku.php;                                         
-        include fastcgi_params;                                                 
-        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;       
-        fastcgi_param REDIRECT_STATUS 200;                                      
-        fastcgi_pass 127.0.0.1:9000;                                            
-# fastcgi_pass unix:/var/run/php5-fpm.sock; #old php version                    
-    }                                                                           
-} 
+server {
+    listen 1080;
+    #server_name liteman.xyz;
+    server_name 127.0.0.1;
+
+    # Maximum file upload size is 4MB - change accordingly if needed
+    client_max_body_size 4M;
+    client_body_buffer_size 128k;
+
+    root /opt/openresty/nginx/html/liteman/wiki;
+    index doku.php;
+
+    #Remember to comment the below out when you're installing, and uncomment it when done.
+    #    location ~ /(conf/|bin/|inc/|install.php) { deny all; }
+
+    #Support for X-Accel-Redirect
+    location ~ ^/data/ { internal ; }
+
+    location ~ ^/lib.*\.(js|css|gif|png|ico|jpg|jpeg)$ {
+        expires 365d;
+    }
+
+    location / { try_files $uri $uri/ @wiki; }
+    #location / { try_files $uri $uri/ =404; }
+
+    location @wiki {
+        # rewrites "doku.php/" out of the URLs if you set the userwrite setting to .htaccess in dokuwiki config page
+        rewrite ^/_media/(.*) /lib/exe/fetch.php?media=$1 last;
+        rewrite ^/_detail/(.*) /lib/exe/detail.php?media=$1 last;
+        rewrite ^/_export/([^/]+)/(.*) /doku.php?do=export_$1&id=$2 last;
+        rewrite ^/(.*) /doku.php?id=$1&$args last;
+    }
+
+    location ~ \.php$ {
+        try_files $uri $uri/ /doku.php;
+        include fastcgi_params;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        fastcgi_param REDIRECT_STATUS 200;
+        fastcgi_pass 127.0.0.1:9000;
+        # fastcgi_pass unix:/var/run/php5-fpm.sock; #old php version
+    }
+}
 ```

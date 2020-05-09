@@ -1,4 +1,5 @@
 # CentOS 最小化配置安装
+> OS: CentOS 7
 
 ## 系统配置
 
@@ -6,7 +7,7 @@
 # 添加管理员用户
 adduser louis
 passwd louis
-/etc/sudoers
+# /etc/sudoers 添加
     root       ALL=(ALL)           ALL
     louis      ALL=(ALL)           ALL
 
@@ -21,7 +22,7 @@ hostnamectl set-hostname louis
 1. 基础应用安装
     ```bash
     # 这里面有些太老应用的需要卸载后重新安装
-    yum install groupinstall "Development Tools"
+    yum groupinstall "Development Tools"
 
     yum install epel-release \
         gcc-c++ \
@@ -41,7 +42,6 @@ hostnamectl set-hostname louis
 
     pip install mycli
     ```
-
 
 2. GCC
     ```bash
@@ -81,11 +81,11 @@ hostnamectl set-hostname louis
 4. Vim
     ```bash
     # 系统自带 vim 不支持某些脚本插件
-    yum install ncurses ncurses-devel readline readline-devel
+    yum install ncurses ncurses-devel readline readline-devel lua lua-devel
 
+    # enbale 选项需要根据实际情况安装对应依赖
     ./configure --prefix=/usr --with-features=huge --enable-rubyinterp \
-        --enable-pythoninterp --enable-python3interp --enable-luainterp \
-        --with-lua-prefix=/usr
+        --enable-pythoninterp --enable-python3interp --enable-luainterp
 
     make && make install
     ```
@@ -140,14 +140,15 @@ hostnamectl set-hostname louis
     # Global Tool Configuration 配置 git (安装的高版本) path: /usr/local/git/bin
     # 安装 NodeJS 插件, 配置 node path
     # 安装 workspace cleanup, Build Environment -> Delete workspace before build starts
-    # NodeJS 配置最终解决方法是不适用系统node 而是使用插件安装
+    # NodeJS 配置最终解决方法是不使用系统node 而是使用插件安装
     ```
 
 7. NodeJS
     ```bash
-    # 下载源码 https://nodejs.org/en/
+    # 下载源码 选择LTS版本 https://nodejs.org/en/
     ./configure
     make && make install
+    # 查看 node npm 版本
     ```
 
 8. shadowsocks
@@ -198,9 +199,13 @@ hostnamectl set-hostname louis
     /usr/lib/systemd/system/nginx.service
 
     systemctl daemon-reload
-    systemctl start nginx
+    systemctl start/stop/restart nginx
     systemctl enable nginx
+
+    # 优雅的热加载 /opt/openresty/nginx/sbin/
+    nginx -s reload
     ```
+
     ```bash
     # 开机启动配置文件
     [Service]
@@ -222,4 +227,42 @@ hostnamectl set-hostname louis
     yum-conf ig-manager --add-repo https://download.docker.corn/linux/centos/docker-ce.repo
     yum install -y docker-ce
     systemctl start docker
+    ```
+
+12. supervisor
+    ```bash
+    # 安装
+    yum install supervisor
+    # 配置 /etc/supervisor.conf include 目录
+    [include]
+    files = supervisord.d/*.conf
+
+    supervisorctl update
+    supervisorctl start/stop/restart program
+    ```
+
+    ```bash
+    # conf 示例
+    # /etc/supervisord.d/nginx.conf
+    # supervisor 只能管理前台程序, 默认后台启动的程序需要加上`-g 'daemon off;'`保证前台启动.
+
+    [program:nginx]
+    environment=
+    process_name=%(program_name)s
+    directory=/opt/openresty/%(program_name)s/sbin/
+    user=root
+    startsecs=10
+    startretries=3
+    stopsignal=QUIT
+    stopwaitsecs=10
+    autostart=true
+    directory=/opt/openresty/%(program_name)s/sbin/
+    stderr_logfile_maxbytes=16MB
+    stderr_logfile_backups=3
+    stderr_logfile=/opt/logs/%(program_name)s/stderr.log
+    stdout_logfile_maxbytes=16MB
+    stdout_logfile_backups=3
+    stdout_logfile=/opt/logs/%(program_name)s/stdout.log
+    ;; nginx
+    command=/opt/openresty/%(program_name)s/sbin/nginx -g 'daemon off;' -c /opt/openresty/nginx/conf/nginx.conf
     ```

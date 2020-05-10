@@ -145,44 +145,21 @@ module.exports = {
                     collapsable: true,
                     children: [
                         "/os/windows/",
-                        "/os/windows/Windows FAQ" // 你的md文件地址
+                        "/os/windows/Windows FAQ"
                     ]
                 },
                 {
                     title: 'UNIX 环境高级编程',
                     collapsable: true,
                     children: [
-                        "/os/note/apue/",
-                        "/os/note/apue/01 UNIX 基础知识",
-                        "/os/note/apue/02 UNIX 标准与实现",
-                        "/os/note/apue/03 文件IO",
-                        "/os/note/apue/04 文件与目录",
-                        "/os/note/apue/05 标准IO库",
-                        "/os/note/apue/06 系统数据文件和信息",
-                        "/os/note/apue/07 进程环境",
-                        "/os/note/apue/08 进程控制",
-                        "/os/note/apue/09 进程关系",
-                        "/os/note/apue/10 信号",
-                        "/os/note/apue/11 线程",
-                        "/os/note/apue/12 线程控制",
-                        "/os/note/apue/13 守护进程",
-                        "/os/note/apue/14 高级IO",
-                        "/os/note/apue/15 进程间通信",
-                        "/os/note/apue/16 网络IPC套接字",
-                        "/os/note/apue/17 高级进程间通信",
-                        "/os/note/apue/18 终端IO",
-                        "/os/note/apue/19 伪终端",
-                        "/os/note/apue/20 数据库函数",
-                        "/os/note/apue/21 与网络打印机通信"
+                        "/os/note/apue/"
                     ]
                 },
                 {
                     title: 'UNIX-LINUX 编程实践教程',
                     collapsable: true,
                     children: [
-                        "/os/note/uulp/",
-                        "/os/note/uulp/01 Unix 系统编程概述",
-                        "/os/note/uulp/02 用户 文件操作与联机帮助 - 编写 who 命令"
+                        "/os/note/uulp/"
                     ]
                 }
             ],
@@ -282,17 +259,7 @@ module.exports = {
                     title: 'TCP/IP 详解',
                     collapsable: true,
                     children: [
-                        "/network/note/tcpip-illustrated/",
-                        "/network/note/tcpip-illustrated/01 概述",
-                        "/network/note/tcpip-illustrated/02 链路层",
-                        "/network/note/tcpip-illustrated/03 IP 网际协议",
-                        "/network/note/tcpip-illustrated/04 ARP 地址解析协议",
-                        "/network/note/tcpip-illustrated/05 RARP 逆地址解析协议",
-                        "/network/note/tcpip-illustrated/06 ICMP Internet 控制报文协议",
-                        "/network/note/tcpip-illustrated/07 Ping 程序",
-                        "/network/note/tcpip-illustrated/08 Traceroute 程序",
-                        "/network/note/tcpip-illustrated/09 IP 选路",
-                        "/network/note/tcpip-illustrated/10 动态选路协议"
+                        "/network/note/tcpip-illustrated/"
                     ]
                 }
             ],
@@ -300,7 +267,7 @@ module.exports = {
                 ""
             ]
         },
-        sidebarDepth: 3,
+        sidebarDepth: 2,
         // 页面滚动
         smoothScroll: true,
         // 文档更新时间：每个文件git最后提交的时间,
@@ -329,9 +296,9 @@ module.exports = {
         'vuepress-plugin-reading-time',
         'vuepress-plugin-reading-progress',
         '@vuepress/back-to-top',
-        '@vuepress/last-updated',
+        //'@vuepress/last-updated',
         'vuepress-plugin-code-copy',
-        'vuepress-plugin-seo',
+        //'vuepress-plugin-seo',
         // 页面滚动时自动激活侧边栏
         ['@vuepress/active-header-links', {
             sidebarLinkSelector: '.sidebar-link',

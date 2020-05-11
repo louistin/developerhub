@@ -222,8 +222,7 @@ module.exports = {
         ['@vuepress/last-updated',
         {
             transformer: (timestamp, lang) => {
-                var time=new Date(timestamp);
-                return time
+                return Convert.ToDateTime(new Date(timestamp));
             }
         }],
         //'vuepress-plugin-seo',

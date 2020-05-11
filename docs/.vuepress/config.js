@@ -219,13 +219,13 @@ module.exports = {
         'vuepress-plugin-reading-progress',
         '@vuepress/back-to-top',
         'vuepress-plugin-code-copy',
-        '@vuepress/last-updated',
+        ['@vuepress/last-updated',
         {
             transformer: (timestamp, lang) => {
                 var time=new Date(timestamp);
                 return time
             }
-        }
+        }],
         //'vuepress-plugin-seo',
         // 页面滚动时自动激活侧边栏
         ['@vuepress/active-header-links', {

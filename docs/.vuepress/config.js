@@ -1,6 +1,6 @@
 module.exports = {
     title: '开发手册',
-    description: '我们立足于美利坚合众国, 针对年满18周岁非大陆全球华人开发, 　　　受北美法律保护. 未經授權禁止复制或建立镜像. 　　　　　We are based in the United States of America, for over 18 years of age non-mainland Chinese open world, by the North American legal protection. Unauthorized reproduction prohibited or create mirror.',
+    description: '　我们立足于美利坚合众国, 针对年满18周岁非大陆全球华人开发, 受北美法律保护.　 　　　　　　　　　　　　　未經授權禁止复制或建立镜像. 　　　　　　　　　　　　We are based in the United States of America, for over 18 years of age non-mainland Chinese open world, by the North American legal protection. Unauthorized reproduction prohibited or create mirror.',
     head: [
         ['link', { rel: 'icon', href: '/image/chrome.png' }]
     ],

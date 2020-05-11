@@ -222,7 +222,17 @@ module.exports = {
         ['@vuepress/last-updated',
         {
             transformer: (timestamp, lang) => {
-                return Convert.ToDateTime(new Date(timestamp));
+                const date = new Date(timestamp) 
+                const dateNumFun = (num) => num < 10 ? `0${num}` : num 
+                const [Y, M, D, h, m, s] = [
+                    date.getFullYear(),
+                    dateNumFun(date.getMonth() + 1),
+                    dateNumFun(date.getDate()),
+                    dateNumFun(date.getHours()),
+                    dateNumFun(date.getMinutes()),
+                    dateNumFun(date.getSeconds())
+                ]
+                return `${Y}-${M}-${D} ${h}:${m}:${s}` 
             }
         }],
         //'vuepress-plugin-seo',

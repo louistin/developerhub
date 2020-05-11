@@ -1,7 +1,7 @@
 ---
 home: true
 heroImage: /image/logo.png
-actionText: Developer 🚩
+actionText: 是, 我知晓! 🔞
 actionLink: /manual/
 features:
 - title: 昨天
@@ -14,4 +14,3 @@ footer: Developerhub © 2019 - 2020 💖 louis.tianlu@gmail.com
 ---
 ---
 <p align="center" style="font-size:100%;color:#C0C0C0">不要高估一天的收获, 不要低估每一天的收获.</p>
-

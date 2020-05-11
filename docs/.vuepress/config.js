@@ -1,6 +1,6 @@
 module.exports = {
     title: '开发手册',
-    description: '源于积累 服务开发',
+    description: '我们立足于美利坚合众国, 针对年满18周岁非大陆全球华人开发, 　　　受北美法律保护. 未經授權禁止复制或建立镜像.　　　　We are based in the United States of America, for over 18 years of age non-mainland Chinese open world, by the North American legal protection. Unauthorized reproduction prohibited or create mirror.',
     head: [
         ['link', { rel: 'icon', href: '/image/chrome.png' }]
     ],
@@ -13,109 +13,16 @@ module.exports = {
     themeConfig: {
         nav: [
             { text: '主页', link: '/' },
-            { text: '工作手册', link: '/manual/' },
-            {
-                text: '计算机基础',
-                items: [
-                    {
-                        text: '数据结构与算法',
-                        link: '/cs/dsa/'
-                    },
-                    {
-                        text: '设计模式',
-                        link: '/cs/design-pattern/'
-                    },
-                    {
-                        text: '数据库',
-                        link: '/cs/database/'
-                    },
-                    {
-                        text: '编程语言',
-                        items: [
-                            { text: 'C', link: '/cs/language/c/' },
-                            { text: 'C++', link: '/cs/language/cpp/' },
-                            { text: 'Java', link: '/cs/language/java/' },
-                            { text: 'Shell', link: '/cs/language/shell/' },
-                            { text: 'Lua', link: '/cs/language/lua/' }
-                        ]
-                    },
-                    {
-                        text: '读书笔记',
-                        items: [
-                            { text: '数据结构与算法: C 语言版', link: '/cs/note/dsac/' }
-                        ]
-                    }
-                ]
-            },
-            {
-                text: '操作系统',
-                items: [
-                    { text: 'Linux', link: '/os/linux/' },
-                    { text: 'Windows', link: '/os/windows/' },
-                    {
-                        text: '读书笔记',
-                        items: [
-                            { text: 'UNIX 环境高级编程', link: '/os/note/apue/' },
-                            { text: 'UNIX-LINUX 编程实践教程', link: '/os/note/uulp/' }
-                        ]
-                    }
-                ]
-            },
-            {
-                text: '网络编程',
-                items: [
-                    { text: 'Socket', link: '/network/socket/' },
-                    { text: 'TCP/IP', link: '/network/tcpip/' },
-                    { text: 'HTTP', link: '/network/http/' },
-                    {
-                        text: '读书笔记',
-                        items: [
-                            { text: 'TCP/IP 详解', link: '/network/note/tcpip-illustrated/' }
-                        ]
-                    }
-                ]
-            },
+            { text: '计算机基础', link: '/cs/' },
+            { text: '网络编程', link: '/network/' },
             { text: '后端开发', link: '/server/' },
-            {
-                text: '前端开发',
-                items: [
-                    { text: 'JavaScript', link: '/web/javascript/' },
-                    { text: 'HTML', link: '/web/html/' },
-                    { text: 'CSS', link: '/web/css/' },
-                    { text: 'Vue', link: '/web/vue/' },
-                    { text: 'FAQ', link: '/web/faq/' },
-                ]
-            },
-            {
-                text: '开源软件',
-                items: [
-                    { text: 'Nginx', link: '/opensource/nginx/' },
-                    { text: 'Libevent', link: '/opensource/libevent/' },
-                    { text: 'Redis', link: '/opensource/redis/' },
-                    { text: 'Others', link: '/opensource/others/' }
-                ]
-            },
-            {
-                text: '开发杂谈',  link: '/discuz/'
-            },
-            {
-                text: '关于', link: '/about/'
-            }
+            { text: '前端开发', link: '/web/' },
+            { text: '开源软件', link: '/opensource/' },
+            { text: '读书笔记', link: '/note/' },
+            { text: '开发手册',  link: '/manual/' },
+            { text: '关于', link: '/about/' }
         ],
         sidebar: {
-            '/manual/': [
-                "",
-                "RHEL 8 前端开发环境搭建指南",
-                "网站自动化布署",
-                "MySQL手册",
-                "CentOS dokuwiki 安装指南",
-                "CentOS 最小化安装配置",
-                "cms 布署文档",
-                "FFMPEG x265 Windows 编译",
-                "SpringBoot + Vue FAQ",
-                "Supervisor FAQ",
-                "Nginx 配置手册"
-            ],
             '/cs/': [
                 {
                     title: '数据结构与算法',
@@ -128,41 +35,53 @@ module.exports = {
                     title: '数据库',
                     collapsable: true,
                     children: [
-                        "/cs/database/"
-                    ]
-                },
-            ],
-            '/os': [
-                {
-                    title: 'Linux',
-                    collapsable: true,
-                    children: [
-                        "/os/linux/"
+                        "/cs/database/",
+                        "/cs/database/MySQL 手册"
                     ]
                 },
                 {
-                    title: 'Windows',
+                    title: 'C/C++',
                     collapsable: true,
                     children: [
-                        "/os/windows/",
-                        "/os/windows/Windows FAQ"
+                        "/cs/c-cpp/"
                     ]
                 },
                 {
-                    title: 'UNIX 环境高级编程',
+                    title: 'Go',
                     collapsable: true,
                     children: [
-                        "/os/note/apue/"
-                    ]
-                },
-                {
-                    title: 'UNIX-LINUX 编程实践教程',
-                    collapsable: true,
-                    children: [
-                        "/os/note/uulp/"
+                        "/cs/go/"
                     ]
                 }
             ],
+
+            '/network': [
+                {
+                    title: 'TCP/IP',
+                    collapsable: true,
+                    children: [
+                        "/network/tcpip/",
+                        "/network/tcpip/TCP 协议",
+                        "/network/tcpip/UDP 协议",
+                        "/network/tcpip/DNS 协议"
+                    ]
+                },
+                {
+                    title: 'Socket',
+                    collapsable: true,
+                    children: [
+                        "/network/socket/"
+                    ]
+                },
+                {
+                    title: 'HTTP',
+                    collapsable: true,
+                    children: [
+                        "/network/http/"
+                    ]
+                }
+            ],
+
             '/web/': [
                 {
                     title: 'JavaScript',
@@ -194,6 +113,7 @@ module.exports = {
                     ]
                 }
             ],
+
             '/opensource': [
                 {
                     title: 'Nginx',
@@ -225,49 +145,51 @@ module.exports = {
                     ]
                 }
             ],
-            '/discuz/': [
+
+            '/note/': [
                 "",
-                "开发技能树",
-                "2020 书单"
+                "TCP-IP详解",
+                "uulp"
             ],
-            '/network': [
+
+            '/manual/': [
                 {
-                    title: 'TCP/IP',
+                    title: 'Windows 开发环境',
                     collapsable: true,
                     children: [
-                        "/network/tcpip/",
-                        "/network/tcpip/TCP 协议",
-                        "/network/tcpip/UDP 协议",
-                        "/network/tcpip/DNS 协议"
+                        "/manual/windows/",
+                        "/manual/windows/FFMPEG x265 Windows 编译"
                     ]
                 },
                 {
-                    title: 'Socket',
+                    title: 'Linux 开发环境',
                     collapsable: true,
                     children: [
-                        "/network/socket/"
+                        "/manual/linux/",
+                        "/manual/linux/RHEL 8 前端开发环境搭建指南",
+                        "/manual/linux/CentOS dokuwiki 安装指南",
+                        "/manual/linux/网站自动化布署",
+                        "/manual/linux/cms 布署文档",
+                        "/manual/linux/Nginx 配置手册",
+                        "/manual/linux/SpringBoot + Vue FAQ",
+                        "/manual/linux/Supervisor FAQ",
                     ]
                 },
                 {
-                    title: 'HTTP',
+                    title: '开发杂谈',
                     collapsable: true,
                     children: [
-                        "/network/http/"
-                    ]
-                },
-                {
-                    title: 'TCP/IP 详解',
-                    collapsable: true,
-                    children: [
-                        "/network/note/tcpip-illustrated/"
+                        "/manual/discuz/",
+                        "/manual/discuz/2020 书单"
                     ]
                 }
             ],
+
             '/about/': [
                 ""
             ]
         },
-        sidebarDepth: 2,
+        sidebarDepth: 1,
         // 页面滚动
         smoothScroll: true,
         // 文档更新时间：每个文件git最后提交的时间,

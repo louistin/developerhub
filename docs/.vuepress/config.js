@@ -222,6 +222,8 @@ module.exports = {
         ['@vuepress/last-updated',
         {
             transformer: (timestamp, lang) => {
+                console.log(timestamp)
+                console.log(lang)
                 const date = new Date(timestamp) 
                 const dateNumFun = (num) => num < 10 ? `0${num}` : num 
                 const [Y, M, D, h, m, s] = [

@@ -35,24 +35,23 @@ module.exports = {
                     title: '数据库',
                     collapsable: true,
                     children: [
-                        "/cs/database/",
-                        "/cs/database/MySQL 手册"
+                        "/cs/database/"
                     ]
                 },
-                {
-                    title: 'C/C++',
-                    collapsable: true,
-                    children: [
-                        "/cs/c-cpp/"
-                    ]
-                },
-                {
-                    title: 'Go',
-                    collapsable: true,
-                    children: [
-                        "/cs/go/"
-                    ]
-                }
+                // {
+                //     title: 'C/C++',
+                //     collapsable: true,
+                //     children: [
+                //         "/cs/c-cpp/"
+                //     ]
+                // },
+                // {
+                //     title: 'Go',
+                //     collapsable: true,
+                //     children: [
+                //         "/cs/go/"
+                //     ]
+                // }
             ],
 
             '/network': [
@@ -66,44 +65,44 @@ module.exports = {
                         "/network/tcpip/DNS 协议"
                     ]
                 },
-                {
-                    title: 'Socket',
-                    collapsable: true,
-                    children: [
-                        "/network/socket/"
-                    ]
-                },
-                {
-                    title: 'HTTP',
-                    collapsable: true,
-                    children: [
-                        "/network/http/"
-                    ]
-                }
+                // {
+                //     title: 'Socket',
+                //     collapsable: true,
+                //     children: [
+                //         "/network/socket/"
+                //     ]
+                // },
+                // {
+                //     title: 'HTTP',
+                //     collapsable: true,
+                //     children: [
+                //         "/network/http/"
+                //     ]
+                // }
             ],
 
             '/web/': [
-                {
-                    title: 'JavaScript',
-                    collapsable: true,
-                    children: [
-                        "/web/javascript/"
-                    ]
-                },
-                {
-                    title: 'HTML',
-                    collapsable: true,
-                    children: [
-                        "/web/html/"
-                    ]
-                },
-                {
-                    title: 'CSS',
-                    collapsable: true,
-                    children: [
-                        "/web/css/"
-                    ]
-                },
+                // {
+                //     title: 'JavaScript',
+                //     collapsable: true,
+                //     children: [
+                //         "/web/javascript/"
+                //     ]
+                // },
+                // {
+                //     title: 'HTML',
+                //     collapsable: true,
+                //     children: [
+                //         "/web/html/"
+                //     ]
+                // },
+                // {
+                //     title: 'CSS',
+                //     collapsable: true,
+                //     children: [
+                //         "/web/css/"
+                //     ]
+                // },
                 {
                     title: 'FAQ',
                     collapsable: true,
@@ -115,27 +114,27 @@ module.exports = {
             ],
 
             '/opensource': [
-                {
-                    title: 'Nginx',
-                    collapsable: true,
-                    children: [
-                        "/opensource/nginx/"
-                    ]
-                },
-                {
-                    title: 'Lievent',
-                    collapsable: true,
-                    children: [
-                        "/opensource/libevent/"
-                    ]
-                },
-                {
-                    title: 'Redis',
-                    collapsable: true,
-                    children: [
-                        "/opensource/redis/"
-                    ]
-                },
+                // {
+                //     title: 'Nginx',
+                //     collapsable: true,
+                //     children: [
+                //         "/opensource/nginx/"
+                //     ]
+                // },
+                // {
+                //     title: 'Lievent',
+                //     collapsable: true,
+                //     children: [
+                //         "/opensource/libevent/"
+                //     ]
+                // },
+                // {
+                //     title: 'Redis',
+                //     collapsable: true,
+                //     children: [
+                //         "/opensource/redis/"
+                //     ]
+                // },
                 {
                     title: 'Others',
                     collapsable: true,
@@ -149,7 +148,8 @@ module.exports = {
             '/note/': [
                 "",
                 "TCP-IP详解",
-                "uulp"
+                "uulp",
+                "MySQL 必知必会"
             ],
 
             '/manual/': [

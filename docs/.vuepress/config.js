@@ -150,7 +150,8 @@ module.exports = {
                 "TCP-IP详解",
                 "uulp",
                 "MySQL 必知必会",
-                "第一本 Docker 书"
+                "第一本 Docker 书",
+                "Linux-UNIX 系统编程手册"
             ],
 
             '/manual/': [

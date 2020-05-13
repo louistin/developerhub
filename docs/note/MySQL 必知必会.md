@@ -1,5 +1,6 @@
-# SQL 数据库
-> 关系型数据库以 `MySQL 必知必会`, `MySQL 5.1 参考手册`为参考书籍对 SQL 数据库做一个比较系统全面的认知
+# MySQL 必知必会
+
+> <p align="left" style="font-family:Arial;font-size:80%;color:#C0C0C0">全文字数 {{ $page.readingTime.words}} words &nbsp;|&nbsp; 阅读时间 {{Math.ceil($page.readingTime.minutes)}} mins</p>
 
 ## 29 - 数据库维护
 1. 备份与恢复

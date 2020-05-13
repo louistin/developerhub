@@ -147,11 +147,11 @@ module.exports = {
 
             '/note/': [
                 "",
-                "TCP-IP详解",
-                "uulp",
+                "Linux-UNIX 系统编程手册",
+                "UNIX-LINUX 编程实践教程",
+                "TCP-IP 详解",
                 "MySQL 必知必会",
                 "第一本 Docker 书",
-                "Linux-UNIX 系统编程手册"
             ],
 
             '/manual/': [

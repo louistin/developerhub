@@ -90,10 +90,10 @@ mysql> show global variables like "%datadir%";
 -- 3. 修改mysql目录
 	shell> vim /etc/my.cnf
 	-- 找到以下两行
-	datadir=/var/lib/mysql                                                          
+	datadir=/var/lib/mysql
 	socket=/var/lib/mysql/mysql.sock
 	-- 修改为
-	datadir=/new/path/mysql                                                          
+	datadir=/new/path/mysql
 	socket=/new/path/mysql/mysql.sock
 
     -- 在文件最后添加
@@ -245,7 +245,7 @@ DELETE FROM table WHERE field = val
 UPDATE table SET field = newval
 
 -- 条件更新
-UPDATE table SET field = newval WHERE field1 = val  
+UPDATE table SET field = newval WHERE field1 = val
 ```
 
 **SELECT**
@@ -393,17 +393,17 @@ ALTER TABLE GATEWAY_PAYMENT_ORDER MODIFY COLUMN STAT varchar(2)  DEFAULT '0' COM
 
 ```SHELL
 # master
-vim /etc/my.cnf  
-    #[必须]启用二进制日志  
-    log-bin=mysql-bin  
-    #[必须]服务器唯一ID，默认是1，一般取IP最后一段  
+vim /etc/my.cnf
+    #[必须]启用二进制日志
+    log-bin=mysql-bin
+    #[必须]服务器唯一ID，默认是1，一般取IP最后一段
     server-id=1
 
 # slave
-vim /etc/my.cnf  
-    #[可选]启用二进制日志  
-    log-bin=mysql-bin  
-    #[必须]服务器唯一ID，默认是1，一般取IP最后一段  
+vim /etc/my.cnf
+    #[可选]启用二进制日志
+    log-bin=mysql-bin
+    #[必须]服务器唯一ID，默认是1，一般取IP最后一段
     server-id=2
     # relay 日志
     relay_log=relay_20161218
@@ -421,17 +421,17 @@ vim /etc/my.cnf
     -- 查看是否成功, 里面有东西就成功了
     mysql> show master status;
     ```
-    查询显示这样的就说明成功了			
-    +------------------+------------+----------------+--------------------+---------------------+		
-    | File             |   Position | Binlog_Do_DB   | Binlog_Ignore_DB   | Executed_Gtid_Set   |		
-    |------------------+------------+----------------+--------------------+---------------------|		
-    | mysql-bin.000006 |        325 |                |                    |                     |		
-    +------------------+------------+----------------+--------------------+---------------------+		
+    查询显示这样的就说明成功了
+    +------------------+------------+----------------+--------------------+---------------------+
+    | File             |   Position | Binlog_Do_DB   | Binlog_Ignore_DB   | Executed_Gtid_Set   |
+    |------------------+------------+----------------+--------------------+---------------------|
+    | mysql-bin.000006 |        325 |                |                    |                     |
+    +------------------+------------+----------------+--------------------+---------------------+
 
 
 
-**SLAVE**			
-    配置slave启动主从复制			
+**SLAVE**
+    配置slave启动主从复制
 
 ```SQL
 mysql> CHANGE MASTER TO master_host='192.168.159.140', master_user='slave', master_password='St@271828', master_log_file='mysql-bin.000006', master_log_pos=154;
@@ -467,16 +467,16 @@ mysql> CREATE DATABASE test;
 mysql> SHOW DATABASES;
 ```
 
--- 下面二者都为YES 就表示成功了			
-Slave_IO_Running              | Yes					
-Slave_SQL_Running             | Yes			
+-- 下面二者都为YES 就表示成功了
+Slave_IO_Running              | Yes
+Slave_SQL_Running             | Yes
 
 
 TODO: 添加其他主从复制相关查询命令及1master, 多slave配置
 
 
 SELECT mci.channelName, mci.channelURL, mci.channelType,
-    COUNT(1) AS userCount , (SELECT COUNT(1) FROM marketDatasourceInfo mdi 
+    COUNT(1) AS userCount , (SELECT COUNT(1) FROM marketDatasourceInfo mdi
     WHERE mdi.`dataType`= 2 AND mdi.channel=mci.channelName) AS loanCount
 FROM marketChannelInfo mci LEFT JOIN marketDatasourceInfo mdi ON mci.channelName=mdi.channel GROUP BY mci.channelName ORDER BY mci.createTime DESC LIMIT 0,10
 

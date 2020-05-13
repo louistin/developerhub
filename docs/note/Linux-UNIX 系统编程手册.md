@@ -120,8 +120,6 @@
   **典型的进程内存结构**<br>
   <img :src="$withBase('/image/note/lpi/06_001.png')" alt="典型的进程内存结构">
 
-  ![测试](https://raw.githubusercontent.com/louistin/developerhub/master/docs/.vuepress/public/image/note/lpi/06_001.png)
-
   ```cpp
   // C语言编程环境提供3个全局符号, 必须显式声明
   extern char etext, edata, end;

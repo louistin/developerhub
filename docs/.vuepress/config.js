@@ -2,13 +2,13 @@ module.exports = {
     title: '开发手册',
     description: '　我们立足于美利坚合众国, 针对年满18周岁非大陆全球华人开发, 受北美法律保护.　 　　　　　　　　　　　　　未經授權禁止复制或建立镜像. 　　　　　　　　　　　　We are based in the United States of America, for over 18 years of age non-mainland Chinese open world, by the North American legal protection. Unauthorized reproduction prohibited or create mirror.',
     head: [
-        ['link', { rel: 'icon', href: '/image/chrome.png' }]
+        ['link', { rel: 'icon', href: '/image/favicon.png' }]
     ],
     port: 2560,
     base: '/',
     markdown: {
-        lineNumbers: true, // 代码块显示行号
-        toc: true
+        lineNumbers: true,  // 代码块显示行号
+        toc: true           // markdown 支持 TOC
     },
     themeConfig: {
         nav: [
@@ -191,15 +191,14 @@ module.exports = {
                 ""
             ]
         },
+
         sidebarDepth: 1,
         // 页面滚动
         smoothScroll: true,
         // 文档更新时间：每个文件git最后提交的时间,
-        lastUpdated: '最后更新',
-
+        lastUpdated: '最近更新',
         displayAllHeaders: false, // 默认值：false
-
-        // 假定是 GitHub. 同时也可以是一个完整的 GitLab URL
+        // GitHub repo 路径
         repo: 'https://github.com/louistin/blog.liteman.git',
         // 自定义仓库链接文字。默认从 `blog.liteman.repo` 中自动推断为
         // "GitHub"/"GitLab"/"Bitbucket" 其中之一，或是 "Source"。
@@ -221,8 +220,7 @@ module.exports = {
         'vuepress-plugin-reading-progress',
         '@vuepress/back-to-top',
         'vuepress-plugin-code-copy',
-        ['@vuepress/last-updated',
-        {
+        [ '@vuepress/last-updated', {
             transformer: (timestamp, lang) => {
                 const date = new Date(timestamp);
                 const dateNumFun = (num) => num < 10 ? `0${num}` : num;
@@ -233,25 +231,24 @@ module.exports = {
                     dateNumFun(date.getHours()),
                     dateNumFun(date.getMinutes()),
                     dateNumFun(date.getSeconds())
-                ]
-                return `${Y}-${M}-${D} ${h}:${m}:${s}`;
+                ];
+
+                return `${Y}-${M}-${D} ${h}:${m}:${s} UTC+08`;
             }
         }],
         //'vuepress-plugin-seo',
         // 页面滚动时自动激活侧边栏
-        ['@vuepress/active-header-links', {
+        [ '@vuepress/active-header-links', {
             sidebarLinkSelector: '.sidebar-link',
             headerAnchorSelector: '.header-anchor'
         }],
-        [
-            '@vuepress/pwa',
-            {
-              serviceWorker: true,
-              updatePopup: {
-                message: '当前网站内容已更新!',
-                buttonText: '刷新',
-              }
-            }
-        ]
+        // [ '@vuepress/pwa', {
+        //       serviceWorker: true,
+        //       updatePopup: {
+        //         message: '当前网站内容已更新!',
+        //         buttonText: '刷新'
+        //       }
+        //     }
+        // ]
     ]
 };

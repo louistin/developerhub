@@ -123,7 +123,7 @@
   ```
 
   **典型的进程内存结构**<br>
-  <img :src="$withBase('/image/note/lpi/06_001_典型的进程内存结构.png')" alt="典型的进程内存结构">
+  <img :src="$withBase('/image/note/tlpi/06_001_典型的进程内存结构.png')" alt="典型的进程内存结构">
 
   ```cpp
   // C语言编程环境提供3个全局符号, 必须显式声明
@@ -193,7 +193,7 @@
     * 减少每个进程使用的 RAM, RAM 中可同时容纳多个进程
 
   **虚拟内存概览**<br>
-  <img :src="$withBase('/image/note/lpi/06_002_虚拟内存概览.png')" alt="虚拟内存概览">
+  <img :src="$withBase('/image/note/tlpi/06_002_虚拟内存概览.png')" alt="虚拟内存概览">
 
 ### 栈和栈帧
 
@@ -211,7 +211,7 @@
 * 函数能够嵌套调用, 所以栈中也可能有多个栈帧
 
   **进程栈**<br>
-  <img :src="$withBase('/image/note/lpi/06_003_进程栈.png')" alt="进程栈">
+  <img :src="$withBase('/image/note/tlpi/06_003_进程栈.png')" alt="进程栈">
 
 ### 命令行参数 `(argc, argv)`
 
@@ -249,7 +249,7 @@
 * 从程序中访问环境
 
   **进程环境列表数据结构**<br>
-  <img :src="$withBase('/image/note/lpi/06_004_进程环境列表数据结构.png')" alt="进程环境列表数据结构">
+  <img :src="$withBase('/image/note/tlpi/06_004_进程环境列表数据结构.png')" alt="进程环境列表数据结构">
 
   ```cpp
   #include <stdlib.h>
@@ -308,13 +308,13 @@
     * 避免内存泄露
 
   **malloc 返回的内存块**<br>
-  <img :src="$withBase('/image/note/lpi/06_005_malloc返回的内存块.png')" alt="malloc 返回的内存块">
+  <img :src="$withBase('/image/note/tlpi/06_005_malloc返回的内存块.png')" alt="malloc 返回的内存块">
 
   **空闲列表中的内存块**<br>
-  <img :src="$withBase('/image/note/lpi/06_006_空闲列表中的内存块.png')" alt="空闲列表中的内存块">
+  <img :src="$withBase('/image/note/tlpi/06_006_空闲列表中的内存块.png')" alt="空闲列表中的内存块">
 
   **包含有已分配内存和空闲内存列表的堆**<br>
-  <img :src="$withBase('/image/note/lpi/06_007_包含有已分配内存和空闲内存列表的堆.png')" alt="包含有已分配内存和空闲内存列表的堆">
+  <img :src="$withBase('/image/note/tlpi/06_007_包含有已分配内存和空闲内存列表的堆.png')" alt="包含有已分配内存和空闲内存列表的堆">
 
 * 调试工具和库
   * 工具

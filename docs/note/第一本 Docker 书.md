@@ -136,7 +136,7 @@ systemctl start/stop/restart docker
   sudo docker inspect daemon_dave --format '{{ .NetworkSettings.IPAddress }}'
 
   # 删除所有容器
-  sudo docker rm 'sudo docker ps -a -q'
+  sudo docker rm `sudo docker ps -a -q`
   ```
 
 
@@ -235,7 +235,7 @@ systemctl start/stop/restart docker
   127.0.0.1:32769
   ```
 
-  ```bash
+  ```dockerfile
   # Version: 0.0.1
   FROM ubuntu:20.04
   MAINTAINER Louis Tian "louis.tianlu@gmail.com"
@@ -250,6 +250,7 @@ systemctl start/stop/restart docker
   RUN echo 'Hi, I am in your container' > /var/www/html/index.nginx-debian.html
   # 指定端口
   EXPOSE 80
+  ONBUILD ADD . /app/src
   ```
 
 * Dockerfile 指令
@@ -291,6 +292,13 @@ systemctl start/stop/restart docker
     * 只关心文件复制, 不做提取和解压
     * 本地文件必须在 Dockerfile 同一目录
 
+  * `ONBUILD`
+    * 为镜像添加触发器 trigger, 当一个镜像被用作其他镜像的基础镜像时, 该镜像的触发器会被执行
+    * 构建时, 会在 `FROM` 后立即执行
+    * 只会被子镜像继承一次, 不能继续被孙镜像继承
+    * 不能使用指令 `FROM` `MAINTAINER` `ONBUILD`
+    * `sudo docker inspect CONTAINER_ID` 查看
+
     ```bash
     # sudo docker run -i -t louis/static_web 不需要再指定 /bin/bash, 并传入 -l 参数
     CMD ["/bin/bash", "-l"]
@@ -320,4 +328,210 @@ systemctl start/stop/restart docker
     ADD software.lic /opt/application/software.lic
 
     COPY conf.d /etc/apache2/
+
+    ONBUILD ADD . /app/src
+    ONBUILD RUN cd /app/src && make
     ```
+
+* 镜像推送到 Docker hub
+
+  ```json
+  sudo docker login
+  sudo docker tag IMAGE_ID DOCKERHUB_USRNAME/IMAGE_NAME:TAG
+  sudo docker push DOCKERHUB_USRNAME/IMAGE_NAME:TAG
+  ```
+
+* 删除镜像
+
+  ```json
+  sudo docker rmi IMAGE_NAME
+  ```
+
+
+## 05 - 在测试中使用 docker
+
+### 使用 docker 测试静态网站
+
+  ```bash
+  # 构建目录
+  [louis@louis sample]$ tree
+  .
+  |-- Dockerfile
+  |-- nginx
+  |   |-- global.conf
+  |   `-- nginx.conf
+  `-- website
+      `-- index.html
+
+  # 构建与运行
+  sudo docker build -t louistian/nginx .
+
+  [louis@louis sample]$ sudo docker images
+  REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+  louistian/nginx     latest              3fdba3a08ccb        20 minutes ago      510MB
+  centos              7                   b5b4d78bc90c        8 days ago          203MB
+
+  # -v 将宿主机 website/ 作为卷, 挂载到容器中
+  # 卷的修改会直接生效, 提交或创建镜像时, 卷不被包含在镜像中. 容器停止, 卷内容依然存在
+  sudo docker run -d -p 80 --name website -v $PWD/website:/var/www/html/website louistian/nginx nginx
+
+  [louis@louis sample]$ sudo docker ps -l
+  CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS                   NAMES
+  2e41582b07fa        louistian/nginx     "nginx"             18 minutes ago      Up 18 minutes       0.0.0.0:32780->80/tcp   website
+  ```
+
+  ```dockerfile
+  # Dockerfile VERSION: 0.0.1
+  FROM centos:7
+  MAINTAINER Louis "louis.tianlu@gmail.com"
+  ENV REFRESHED_AT 2020-05-14
+  RUN yum update -y
+  RUN yum install epel-release -y
+  RUN yum install nginx -y
+  RUN mkdir -p /var/www/html
+  # 不同风格的复制
+  ADD nginx/global.conf /etc/nginx/conf.d/
+  ADD nginx/nginx.conf /etc/nginx/nginx.conf
+  EXPOSE 80
+  ```
+
+  ```bash
+  # global.conf
+  server {
+    listen          0.0.0.0:80;
+    server_name     _;
+
+    root            /var/www/html/website;
+    index           index.html index.htm;
+
+    access_log      /var/log/nginx/default_accesss.log;
+    error_log       /var/log/nginx/default_error.log;
+  }
+  ```
+
+  ```conf
+  # nginx.conf
+  user root;
+  worker_processes 2;
+  pid /run/nginx.pid;
+  daemon off;   # nginx 强制前台运行, 进程不中断, 保持容器活跃状态
+
+  events {}
+
+  http {
+      sendfile on;
+      tcp_nopush on;
+      tcp_nodelay on;
+      keepalive_timeout 65;
+      types_hash_max_size 2048;
+      include /etc/nginx/mime.types;
+      default_type application/octet-stream;
+      access_log /var/log/nginx/access.log;
+      error_log /var/log/nginx/error.log;
+      gzip on;
+      gzip_disable "msie6";
+      include /etc/nginx/conf.d/*.conf;
+  }
+  ```
+
+  ```html
+  <!-- index.html -->
+  Hello World.<br>
+  louis.tianlu@gmail.com
+  ```
+
+### 使用 Docker 构建并测试 Web 应用程序
+
+#### 构建 sinatra 镜像与容器
+
+  ```bash
+  # 添加 webapp 目录, 并确保 webapp/bin/webapp 权限可执行
+  [louis@louis sinatra]$ tree
+  .
+  |-- Dockerfile
+  `-- webapp
+      |-- bin
+      |   `-- webapp
+      |-- Dockerfile
+      `-- lib
+          `-- app.rb
+
+  sudo docker build -t louistian/sinatra .
+  sudo docker run -d -p 4567 --name webapp -v $PWD/webapp:/opt/webapp louistian/sinatra
+
+  # docker logs 类似 tail
+  sudo docker logs webapp
+  sudo docker logs -f webapp
+
+  sudo docker top webapp
+  sudo docker port webapp 4567
+
+  [louis@louis sinatra]$ curl -i -H 'Accept: application/json' -d 'name=louis&status=online' http://localhost:32781/json
+  HTTP/1.1 200 OK
+  Content-Type: text/html;charset=utf-8
+  Content-Length: 34
+  X-Xss-Protection: 1; mode=block
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: SAMEORIGIN
+  Server: WEBrick/1.6.0 (Ruby/2.7.0/2019-12-25)
+  Date: Thu, 14 May 2020 08:22:01 GMT
+  Connection: Keep-Alive
+
+  {"name":"louis","status":"online"}
+  ```
+
+  ```dockerfile
+  # Version: 0.0.1
+  FROM ubuntu:20.04
+  MAINTAINER Louis "louis.tianlu@gmail.com"
+  ENV REFRESHED_AT 2020-05-14
+
+  RUN sed -i s@/security.ubuntu.com/@/mirrors.aliyun.com/@g /etc/apt/sources.list
+  RUN sed -i s@/archive.ubuntu.com/@/mirrors.aliyun.com/@g /etc/apt/sources.list
+  RUN apt update -y
+  RUN apt install -y ruby ruby-dev build-essential redis-tools
+  RUN gem install --no-document sinatra json redis
+
+  RUN mkdir -p /opt/webapp
+
+  EXPOSE 4567
+
+  CMD [ "/opt/webapp/bin/webapp" ]
+  ```
+
+#### 构建 redis 镜像与服务
+
+  ```bash
+  [louis@louis redis]$ tree
+  .
+  `-- Dockerfile
+
+  sudo docker build -t louistian/redis .
+  # 添加 --protected-mode no 否则测试时连接后不能操作
+  sudo docker run -d -p 6379 --name redis louistian/redis --protected-mode no
+
+  # 可以在宿主机连接测试
+  redis-cli -h 127.0.0.1 -p PORT
+  ```
+
+  ```dockerfile
+  # Version: 0.0.1
+  FROM ubuntu:18.04
+  LABEL maintainer="louis.tianlu@gmail.com"
+  ENV REFRESHED_AT 2020-05-14
+
+  RUN sed -i s@/security.ubuntu.com/@/mirrors.aliyun.com/@g /etc/apt/sources.list
+  RUN sed -i s@/archive.ubuntu.com/@/mirrors.aliyun.com/@g /etc/apt/sources.list
+  RUN apt update -y
+  RUN apt install -y redis-server redis-tools
+
+  EXPOSE 6379
+
+  ENTRYPOINT ["/usr/bin/redis-server"]
+
+  CMD [ ]
+  ```
+
+* docker 自己的网络栈
+  * docker 容器公开端口并绑定到本地网络接口
+* 内部网络

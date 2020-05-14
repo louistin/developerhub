@@ -373,3 +373,115 @@
   y = alloca(size);
   func(x, y, z);
   ```
+
+
+## 13 - 文件 I/O 缓冲
+
+* 出于速度和效率的考虑, 系统 I/O 调用(内核调用)和标准 C 语言库 I/O 函数(stdio 函数)在操作
+  磁盘文件时会对数据进行缓冲
+
+### 文件 I/O 的内核缓冲: 缓冲区高速缓存
+
+* `raed()` 和 `write()` 系统调用在操作磁盘文件时不会直接发起磁盘访问, 而是仅在用户空间缓冲
+  区和内核缓冲区高速缓存间复制数据.
+  * 对于 write 函数调用后立刻返回, 在后续某个时刻, 内核会将其缓冲区中数据写入磁盘
+  * 对于 read 函数, 内核会从磁盘中读取数据并存储到内核缓冲区中, read 调用将从缓冲区读取数据
+
+### stdio 库的缓冲
+
+* 操作磁盘文件时, 缓冲大块数据减少系统调用
+* C 语言函数库 I/O 函数都带有缓冲
+  * `fprintf()`, `fscanf()`, `fputs()`, `fgets()`, `fputc()`, `fgetc()`
+
+
+  ```c
+  #include <stdio.h>
+
+  // stdio 库缓冲区控制函数
+  // buff 为 NULL 时为 stream 自动分配缓冲区, 忽略 szie
+  //      不为 NULL, 以其指向大小为size 的内存块作为 stream 的缓冲区
+  // mode _IONBUF 不缓冲
+  //      _IOLBF 行缓冲
+  //      _LOFBF 全缓冲 (缓冲区满为止)
+  int setvbuf(FILE *stream, char *buf, int mode, size_t size);
+
+  // 相当于 setvbuf(stream, buf, (buf != NULL) ? _IOFBUF : _IONBUF, BUFSIZE);
+  // BUFSIZE 8192
+  void setbuf(FILE *stream, char *buf);
+
+  // 相当于 setvbuf(stream, buf, (buf != NULL) ? _IOFBUF : _IONBUF, size);
+  void setbufex(FILE *stream, char *buf, size_t size);
+
+  // stream NULL 刷新所有 stdio 缓冲区
+  // 关闭相应流时, 将自动刷新其缓冲区
+  int fflush(FILE *stream);
+  ```
+
+### 控制文件 I/O 的内核缓冲
+
+* 两种同步 I/O 完成类型(区别设计用于描述文件的元数据)
+  * synchronized I/O data integrity completion
+    * 确保针对文件的一次更新传递了足够的信息到磁盘, 以便之后对数据的获取
+  * synchronized I/O file integrity completion
+    * 前一种的超集
+    * 在对文件的一次更新过程中, 要将所有发生更新的文件元数据都传递到磁盘上, 即使有些在后续对
+      文件数据的操作中并不需要
+
+  ```cpp
+  #include <unistd.h>
+
+  // 使缓冲数据和于fd相关的所有元数据都刷新到磁盘上, synchronized I/O file integrity completion
+  int fsync(int fd);
+
+  // 可能会减少对磁盘的操作次数, synchronized I/O data integrity completion
+  int fdatasync(int fd);
+
+  // 会使包含更新文件信息的所有内核缓冲区刷新到磁盘上
+  void sync(void);
+  ```
+
+* 使所有写入同步: O_SYNC
+  * synchronized I/O file integrity completion
+  * `fd = open(pathname, OWRONLY | O_SYNC);`
+  * 使用 O_SYNC 或频繁调用上述函数对性能影响极大
+  * 不推荐在打开文件时就使用 O_SYNC 标志, 如果需要强制刷新内核缓冲区, 考虑使用大尺寸 `write()`
+    缓冲区, 或谨慎调用上述函数
+* O_DSYNC, O_RSYNC
+  * O_DSYNC
+    * synchronized I/O data integrity completion
+  * O_RSYNC
+    * 配和 O_DSYNC, O_SYNC 将这些标志对写操作的作用结合到读操作中
+
+  **I/O 缓冲**<br>
+  <img :src="$withBase('/image/note/tlpi/13_001_IO缓冲.png')" alt="I/O 缓冲">
+
+### 就 I/O 模式向内核提出建议
+
+* 内核可以根据(但不必要) `posix_fadvise()` 所提供的信息来优化对缓冲区高速缓存的使用
+
+### 绕过缓冲区高速缓存: 直接 I/O
+
+* 直接 I/O direct I/O
+  * 应用程序在执行磁盘 I/O 时绕过缓冲区高速缓存, 从用户空间直接将数据传递到文件或磁盘设备
+  * 直接 I/O 只适用于有特定 I/O 需求的应用, 如数据库.
+  * `fd = open(pathname, RDONLY | O_DIRECT);` 打开指定标志 `O_DIRECT`
+* 直接 I/O 对齐限制
+  * 用于传递数据的缓冲区, 其内存边界必须对齐为块大小的整数倍
+  * 数据传输的开始点, 即文件和设备的偏移量, 必须是块大小的整数倍
+  * 带传递数据的长度必须时块大小的整数倍
+  * 未对齐导致 EINVAL 错误
+
+### 混合使用库函数和系统调用进行文件 I/O
+
+* I/O 系统调用会直接将数据传递到内核缓冲区高速缓存
+* stdio 库函数会等到用户空间的流缓冲区填满, 再调用 `write()` 将其传递到内核缓冲区高速缓存
+* 可以使用 `fflush()` 规避混用问题
+
+```cpp
+#include <stdio.h>
+
+// 返回对应的文件描述符
+int fileno(FILE *stream);
+// 创建使用该文件描述符进行文件 I/O 的流
+FILE *fdopen(int fd, const char *mode);
+```

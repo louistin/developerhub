@@ -233,7 +233,7 @@ module.exports = {
                     dateNumFun(date.getSeconds())
                 ];
 
-                return `${Y}-${M}-${D} ${h}:${m}:${s} UTC+08`;
+                return `${Y}-${M}-${D} ${h}:${m}:${s} UTC+08:00`;
             }
         }],
         //'vuepress-plugin-seo',

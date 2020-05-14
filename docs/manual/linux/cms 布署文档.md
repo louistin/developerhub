@@ -64,7 +64,7 @@ nginx.ext -s quit
 # Windows 开发调试 nginx.conf 配置
 # 1080 网页请求 port
 # 2560 Vue 项目 port
-# 2561 String Boot 项目 port 
+# 2561 String Boot 项目 port
 # 以上端口号可以根据代码中的配置进行更改
 server {
     listen       1080;
@@ -119,7 +119,7 @@ server {
 
 ```conf
 # Linux 正式布署配置
-# Vue build 生成的网页文件放在 html/cms 
+# Vue build 生成的网页文件放在 html/cms
 server {
     listen 	1080;
     server_name localhost;
@@ -156,7 +156,7 @@ server {
     location ~ .*\.(gif|jpg|jpeg|png)$ {
         root /opt/openresty/nginx/html/cms;
         autoindex on;
-    }   
+    }
 
     error_page   500 502 503 504  /50x.html;
     location = /50x.html {
@@ -192,8 +192,8 @@ directory=/home/xmcloud/apps/%(program_name)s
 user=root
 startsecs=10    ; 启动10s 后没有异常退出, 认为是正常启动
 startretries=3  ; 启动失败自动重试次数
-stopsignal=QUIT 
-stopwaitsecs=10 
+stopsignal=QUIT
+stopwaitsecs=10
 autostart=true
 stderr_logfile_maxbytes=50MB
 stderr_logfile_backups=2

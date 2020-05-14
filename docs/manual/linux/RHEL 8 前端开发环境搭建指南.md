@@ -30,27 +30,27 @@ java -jar test.jar
 # /etc/maven/setting 配置
 # 这里只是个参考, 实际操作中修改了编译会报错
 <mirrors>
-    <mirror>                                                                   
-        <id>alimaven</id>                                                        
-        <mirrorOf>central</mirrorOf>                                             
-        <name>aliyun maven</name>                                                
-        <url>http://maven.aliyun.com/nexus/content/repositories/central/</url>   
-    </mirror>                                                                  
-    <mirror>                                                                   
-        <id>alimaven</id>                                                        
-        <name>Nexus aliyun</name>                                                
+    <mirror>
+        <id>alimaven</id>
+        <mirrorOf>central</mirrorOf>
+        <name>aliyun maven</name>
+        <url>http://maven.aliyun.com/nexus/content/repositories/central/</url>
+    </mirror>
+    <mirror>
+        <id>alimaven</id>
+        <name>Nexus aliyun</name>
         <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
-        <mirrorOf>*</mirrorOf>                                                   
-    </mirror>                                                                  
-</mirrors> 
+        <mirrorOf>*</mirrorOf>
+    </mirror>
+</mirrors>
 
 # 配置本地仓库, 这个用起来没问题
-<localRepository>/usr/local/etc/maven/repository</localRepository> 
+<localRepository>/usr/local/etc/maven/repository</localRepository>
 ```
 
 ## 2. Vue 开发环境搭建
 ```bash
-yum install -y npm 
+yum install -y npm
 
 npm install -g cnpm --registry=https://registry.npm.taobao.org
 

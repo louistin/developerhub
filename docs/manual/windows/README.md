@@ -1,8 +1,15 @@
-# Windows FAQ
+# Windows 环境配置指南
 
-## 1. Windows 系统
+> <p align="left" style="font-family:Arial;font-size:80%;color:#C0C0C0">全文字数 {{ $page.readingTime.words}} words &nbsp;|&nbsp; 阅读时间 {{Math.ceil($page.readingTime.minutes)}} mins</p>
 
-## 2. 浏览器
+[[TOC]]
+
+---
+
+## 操作系统
+
+## 软件配置
+
 ###  Chrome
 * Chrome 字体美化
     1. 安装 [Stylus](https://link.zhihu.com/?target=https%3A//chrome.google.com/webstore/detail/stylus/clngdbkpkpeebahjckkjfobafhncgmne%3Fhl%3Dzh)
@@ -10,9 +17,9 @@
 
 ###  Firefox
 
-## 3. IDE
 ### Visual Studio Code
 * Settings
+
     ```json
     {
         "C_Cpp.updateChannel": "Insiders",
@@ -43,4 +50,12 @@
         `Microsoft VS Code\resources\app\extensions\theme-solarized-dark\themes`
         打开 `solarized-dark-color-theme`, 将 `comment` 的 `italic` 删除为空
 
-## 4. 其他
+### Git
+
+```bash
+# 解决 github 上传代码换行符自动转换问题, 使用 UNIX 标准 LF 为换行符
+# 设置不自动转换
+git config --global core.autocrlf false
+# 添加换行符检查, 提交时发现混用禁止提交
+git config --global core.safecrlf true
+```

@@ -335,7 +335,7 @@ systemctl start/stop/restart docker
 
 * 镜像推送到 Docker hub
 
-  ```json
+  ```bash
   sudo docker login
   sudo docker tag IMAGE_ID DOCKERHUB_USRNAME/IMAGE_NAME:TAG
   sudo docker push DOCKERHUB_USRNAME/IMAGE_NAME:TAG
@@ -343,7 +343,7 @@ systemctl start/stop/restart docker
 
 * 删除镜像
 
-  ```json
+  ```bash
   sudo docker rmi IMAGE_NAME
   ```
 

@@ -499,7 +499,7 @@ systemctl start/stop/restart docker
   CMD [ "/opt/webapp/bin/webapp" ]
   ```
 
-#### 构建 redis 镜像与服务
+#### 构建 redis 镜像与容器
 
   ```bash
   [louis@louis redis]$ tree
@@ -532,6 +532,229 @@ systemctl start/stop/restart docker
   CMD [ ]
   ```
 
-* docker 自己的网络栈
-  * docker 容器公开端口并绑定到本地网络接口
-* 内部网络
+  * docker 自己的网络栈
+    * docker 容器公开端口并绑定到本地网络接口, 这样可以把容器里的服务在本地宿主机所在的外部网络
+      上公开
+    * 内部网络
+      * docker0
+        * 虚拟的以太网桥, 用于连接容器和本地宿主网络
+      * veth*
+        * 容器创建时会创建一组互联的网络接口. 接口其中一端作为容器里的 eth0 接口, 另一端统一命
+          名为 veth*, 作为宿主机的一个端口
+        * 每个 veth* 接口都绑定到 docker0 网桥, 由此创建一个由宿主机和所有容器共享的虚拟子网
+
+      ```bash
+      # 宿主机
+      # docker0 虚拟网桥
+      [louis@louis redis]$ ifconfig
+      docker0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+              inet 172.18.0.1  netmask 255.255.0.0  broadcast 172.18.255.255
+              inet6 fe80::42:faff:fe65:fc0  prefixlen 64  scopeid 0x20<link>
+              ether 02:42:fa:65:0f:c0  txqueuelen 0  (Ethernet)
+              RX packets 76935  bytes 4351084 (4.1 MiB)
+              RX errors 0  dropped 0  overruns 0  frame 0
+              TX packets 172917  bytes 1111531538 (1.0 GiB)
+              TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+      eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+              inet 172.17.0.2  netmask 255.255.240.0  broadcast 172.17.15.255
+              inet6 fe80::5054:ff:fe1d:9861  prefixlen 64  scopeid 0x20<link>
+              ether 52:54:00:1d:98:61  txqueuelen 1000  (Ethernet)
+              RX packets 2232356  bytes 1938976249 (1.8 GiB)
+              RX errors 0  dropped 0  overruns 0  frame 0
+              TX packets 1259922  bytes 288469632 (275.1 MiB)
+              TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+      lo: flags=73<UP,LOOPBACK,RUNNING>  mtu 65536
+              inet 127.0.0.1  netmask 255.0.0.0
+              inet6 ::1  prefixlen 128  scopeid 0x10<host>
+              loop  txqueuelen 1  (Local Loopback)
+              RX packets 213  bytes 34695 (33.8 KiB)
+              RX errors 0  dropped 0  overruns 0  frame 0
+              TX packets 213  bytes 34695 (33.8 KiB)
+              TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+      veth36ad046: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+              inet6 fe80::c434:a4ff:fe9a:e233  prefixlen 64  scopeid 0x20<link>
+              ether c6:34:a4:9a:e2:33  txqueuelen 0  (Ethernet)
+              RX packets 0  bytes 0 (0.0 B)
+              RX errors 0  dropped 0  overruns 0  frame 0
+              TX packets 7  bytes 578 (578.0 B)
+              TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+      vethb6c2a94: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+              inet6 fe80::68b3:89ff:fe9a:6296  prefixlen 64  scopeid 0x20<link>
+              ether 6a:b3:89:9a:62:96  txqueuelen 0  (Ethernet)
+              RX packets 0  bytes 0 (0.0 B)
+              RX errors 0  dropped 0  overruns 0  frame 0
+              TX packets 10  bytes 828 (828.0 B)
+              TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+      # 容器
+      # docker 为容器分配了 IP 172.18.0.3
+      root@cb9492edd6b6:/# ifconfig
+      eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+              inet 172.18.0.3  netmask 255.255.0.0  broadcast 172.18.255.255
+              ether 02:42:ac:12:00:03  txqueuelen 0  (Ethernet)
+              RX packets 6639  bytes 31259333 (31.2 MB)
+              RX errors 0  dropped 0  overruns 0  frame 0
+              TX packets 760  bytes 50193 (50.1 KB)
+              TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+      lo: flags=73<UP,LOOPBACK,RUNNING>  mtu 65536
+              inet 127.0.0.1  netmask 255.0.0.0
+              loop  txqueuelen 1  (Local Loopback)
+              RX packets 0  bytes 0 (0.0 B)
+              RX errors 0  dropped 0  overruns 0  frame 0
+              TX packets 0  bytes 0 (0.0 B)
+              TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+      # 容器访问外网, 第一跳就是宿主机网络上的 docker0 接口的网关 IP
+      root@cb9492edd6b6:/# traceroute www.baidu.com
+      traceroute to www.baidu.com (180.101.49.11), 30 hops max, 60 byte packets
+      1  172.18.0.1 (172.18.0.1)  0.028 ms  0.011 ms  0.009 ms
+      2  * 100.105.105.130 (100.105.105.130)  2.081 ms  2.970 ms
+      3  * 100.104.251.210 (100.104.251.210)  0.643 ms *
+      ```
+
+  * 连接 redis
+    * 通过映射到宿主机的 PORT
+    * 直接使用虚拟子网 IP PORT
+
+      ```bash
+      [louis@louis redis]$ sudo docker inspect redis
+      [
+        {
+          "NetworkSettings": {
+                "Bridge": "",
+                "SandboxID": "868e968ad8ca579357c716c6f6786651c8a1c00efda93f15f7c151a416902d0b",
+                "HairpinMode": false,
+                "LinkLocalIPv6Address": "",
+                "LinkLocalIPv6PrefixLen": 0,
+                "Ports": {
+                    "6379/tcp": [
+                        {
+                            "HostIp": "0.0.0.0",
+                            "HostPort": "32786"
+                        }
+                    ]
+                },
+                "SandboxKey": "/var/run/docker/netns/868e968ad8ca",
+                "SecondaryIPAddresses": null,
+                "SecondaryIPv6Addresses": null,
+                "EndpointID": "3ccba82cda80d3f56e545182d779e4b91c3e905ef03d57c5c17a4f83b582d0fa",
+                "Gateway": "172.18.0.1",
+                "GlobalIPv6Address": "",
+                "GlobalIPv6PrefixLen": 0,
+                "IPAddress": "172.18.0.2",
+                "IPPrefixLen": 16,
+                "IPv6Gateway": "",
+                "MacAddress": "02:42:ac:12:00:02",
+                "Networks": {
+                    "bridge": {
+                        "IPAMConfig": null,
+                        "Links": null,
+                        "Aliases": null,
+                        "NetworkID": "7e1e523b599001e0d6b924e457ece4e960ab73aee50bac5f27e5763066570839",
+                        "EndpointID": "3ccba82cda80d3f56e545182d779e4b91c3e905ef03d57c5c17a4f83b582d0fa",
+                        "Gateway": "172.18.0.1",
+                        "IPAddress": "172.18.0.2",
+                        "IPPrefixLen": 16,
+                        "IPv6Gateway": "",
+                        "GlobalIPv6Address": "",
+                        "GlobalIPv6PrefixLen": 0,
+                        "MacAddress": "02:42:ac:12:00:02",
+                        "DriverOpts": null
+                    }
+                }
+            }
+        }
+      ]
+
+      # 使用映射 PORT
+      [louis@louis redis]$ redis-cli -h 127.0.0.1 -p 32786
+      127.0.0.1:32786>
+
+      # 直接使用子网 IP PORT
+      [louis@louis redis]$ redis-cli -h 172.18.0.2 -p 6379
+      172.18.0.2:6379>
+      ```
+
+  * 容器互连
+
+    ```bash
+    # 确保 redis 容器启动
+    sudo docker run -d --name redis louistian/redis
+
+    # --link 建立两个容器间的父子关系
+    #         redis 要连接的容器名称
+    #         db 连接后容器别名
+    [louis@louis sinatra]$ sudo docker run -p 4567 --name webapp --link redis:db -t -i -v $PWD/webapp:/opt/webapp louistian/sinatra /bin/bash
+
+    # 查看连接信息
+    root@d99a012cf351:/# cat /etc/hosts
+    127.0.0.1	localhost
+    172.18.0.2	db 34177ffe0f93 redis
+    172.18.0.3	d99a012cf351
+
+    root@d99a012cf351:/# env
+    REFRESHED_AT=2020-05-14
+    HOSTNAME=d99a012cf351
+    PWD=/
+    DB_PORT_6379_TCP_ADDR=172.18.0.2
+    DB_PORT_6379_TCP=tcp://172.18.0.2:6379
+    DB_PORT=tcp://172.18.0.2:6379
+    HOME=/root
+    ...
+    ```
+
+  * 容器通信
+
+    ```bash
+    # louistian/sinatra 中启动
+    root@d99a012cf351:~# /opt/webapp/bin/webapp &
+
+    # 宿主机请求
+    [louis@louis lib]$ curl -i -H 'Accept: application/json' -d 'name=louis&status=online' http://localhost:32790/json
+    # 查看 redis 容器数据
+    [louis@louis lib]$ curl -i http://localhost:32790/json
+    HTTP/1.1 200 OK
+    Content-Type: text/html;charset=utf-8
+    Content-Length: 46
+    X-Xss-Protection: 1; mode=block
+    X-Content-Type-Options: nosniff
+    X-Frame-Options: SAMEORIGIN
+    Server: WEBrick/1.6.0 (Ruby/2.7.0/2019-12-25)
+    Date: Fri, 15 May 2020 02:36:13 GMT
+    Connection: Keep-Alive
+
+    "[{\"name\":\"louis\",\"status\":\"online\"}]"
+    ```
+
+    ```conf
+    # /home/louis/studio/sinatra/webapp/lib
+    require "rubygems"
+    require "sinatra"
+    require "json"
+    require "redis"
+
+    class App < Sinatra::Application
+          redis = Redis.new(:host => 'db', :port => '6379')
+
+          set :bind, '0.0.0.0'
+
+          get '/' do
+            "<h1>DockerBook Test Redis-enabled Sinatra app</h1>"
+          end
+
+          get '/json' do
+            params = redis.get "params"
+            params.to_json
+          end
+
+          post '/json/?' do
+            redis.set "params", [params].to_json
+            params.to_json
+          end
+    end
+    ```

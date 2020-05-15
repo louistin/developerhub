@@ -731,7 +731,7 @@ systemctl start/stop/restart docker
     "[{\"name\":\"louis\",\"status\":\"online\"}]"
     ```
 
-    ```conf
+    ```bash
     # /home/louis/studio/sinatra/webapp/lib
     require "rubygems"
     require "sinatra"

@@ -154,7 +154,7 @@ systemctl start/stop/restart docker
   * 这个读写层及其下面的镜像层以及一些配置数据, 就构成一个容器
 
 **Docker 文件系统层**<br>
-  <img :src="$withBase('/image/note/thedockerbook/04_001_docker文件系统层.png')" alt="Docker 文件系统层">
+  <img :src="$withBase('/image/note/thedockerbook/04_001_docker文件系统层.webp')" alt="Docker 文件系统层">
 
 ### 列出镜像
 
@@ -758,5 +758,5 @@ systemctl start/stop/restart docker
           end
     end
     ```
-    
+
 > ! docker 学习暂时告一段落, 接下来内容主要以应用为主

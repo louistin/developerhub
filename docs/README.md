@@ -1,6 +1,6 @@
 ---
 home: true
-heroImage: /image/logo.png
+heroImage: /image/logo.webp
 actionText: 是, 我知晓! 🔞
 actionLink: /manual/
 features:

@@ -11,7 +11,7 @@
 ### 分层
 
 **TCP/IP 协议族分层**<br>
-<img :src="$withBase('/image/network/tcpip-illustrated/01/tcpip_002.png')" alt="TCP/IP 协议族分层">
+<img :src="$withBase('/image/note/tcpip-illustrated/01/tcpip_002.webp')" alt="TCP/IP 协议族分层">
 
 ```bash
 链路层
@@ -27,7 +27,7 @@
 ### 互联网地址
 
 **五类IP地址**<br>
-<img :src="$withBase('/image/network/tcpip-illustrated/01/ip_address_001.png')" alt="五类 IP 地址">
+<img :src="$withBase('/image/note/tcpip-illustrated/01/ip_address_001.webp')" alt="五类 IP 地址">
 
 ```bash
 A: 0.0.0.0   - 127.255.255.255
@@ -42,7 +42,7 @@ E: 240.0.0.0 - 247.255.255.255
 ### 封装
 
 **数据封装**<br>
-<img :src="$withBase('/image/network/tcpip-illustrated/01/data_package_001.png')" alt="数据封装">
+<img :src="$withBase('/image/note/tcpip-illustrated/01/data_package_001.webp')" alt="数据封装">
 
 ```bash
 TCP -> IP 的数据单元称为 TCP 段(TCP segment)
@@ -53,7 +53,7 @@ IP -> 网络接口层 的数据单元称为 IP 数据报(IP datagram)
 ### 分用
 
 **数据分用**<br>
-<img :src="$withBase('/image/network/tcpip-illustrated/01/data_demultiplexing_001.png')" alt="数据分用">
+<img :src="$withBase('/image/note/tcpip-illustrated/01/data_demultiplexing_001.webp')" alt="数据分用">
 
 ```bash
 Demultiplexing
@@ -86,7 +86,7 @@ Demultiplexing
 ### 环回接口
 
 **环回接口处理IP数据报流程**<br>
-<img :src="$withBase('/image/network/tcpip-illustrated/02/lookback_interface_001.png')" alt="环回接口处理IP数据报流程">
+<img :src="$withBase('/image/note/tcpip-illustrated/02/lookback_interface_001.webp')" alt="环回接口处理IP数据报流程">
 
 ```bash
 Loopback Interface
@@ -162,7 +162,7 @@ lo              65536     7527      0      0 0          7527      0      0      
 ### IP 首部
 
 **IP 首部**
-<img :src="$withBase('/image/network/tcpip-illustrated/03/ip_header_001.png')" alt="IP 首部">
+<img :src="$withBase('/image/note/tcpip-illustrated/03/ip_header_001.webp')" alt="IP 首部">
 
 
 ```bash
@@ -257,7 +257,7 @@ B 类地址子网编址
 ### 特殊情况 IP
 
 **特殊 IP地址**<br>
-<img :src="$withBase('/image/network/tcpip-illustrated/03/special_ip_001.png')" alt="特殊 IP地址">
+<img :src="$withBase('/image/note/tcpip-illustrated/03/special_ip_001.webp')" alt="特殊 IP地址">
 
 ### 命令
 
@@ -341,7 +341,7 @@ lo              65536     7566      0      0 0          7566      0      0      
 * FTP 示例
 
     **FTP ARP 流程**<br>
-    <img :src="$withBase('/image/network/tcpip-illustrated/04/arp_ftp_001.png')" alt="FTP ARP 流程">
+    <img :src="$withBase('/image/note/tcpip-illustrated/04/arp_ftp_001.webp')" alt="FTP ARP 流程">
 
     ```bash
     # ftp louistian.xyz
@@ -383,7 +383,7 @@ _gateway (192.168.6.2) at 00:50:56:eb:f3:c0 [ether] on ens160
 ### ARP 分组格式
 
 **ARP 分组格式**<br>
-<img :src="$withBase('/image/network/tcpip-illustrated/04/arp_format_001.png')" alt="ARP 分组格式">
+<img :src="$withBase('/image/note/tcpip-illustrated/04/arp_format_001.webp')" alt="ARP 分组格式">
 
 * PING 示例
 
@@ -405,7 +405,7 @@ _gateway (192.168.6.2) at 00:50:56:eb:f3:c0 [ether] on ens160
     ```
 
     - ARP 广播请求
-    <img :src="$withBase('/image/network/tcpip-illustrated/04/arp_broadcast_001.png')" alt="ARP 广播请求">
+    <img :src="$withBase('/image/note/tcpip-illustrated/04/arp_broadcast_001.webp')" alt="ARP 广播请求">
 
     ```bash
     以太网帧头部分
@@ -426,7 +426,7 @@ _gateway (192.168.6.2) at 00:50:56:eb:f3:c0 [ether] on ens160
     ```
 
     - ARP 广播响应
-    <img :src="$withBase('/image/network/tcpip-illustrated/04/arp_broadcast_002.png')" alt="ARP 广播响应">
+    <img :src="$withBase('/image/note/tcpip-illustrated/04/arp_broadcast_002.webp')" alt="ARP 广播响应">
 
     ```bash
     以太网帧头部分
@@ -448,7 +448,7 @@ _gateway (192.168.6.2) at 00:50:56:eb:f3:c0 [ether] on ens160
 ### RARP 协议
 
 **RARP 分组格式**<br>
-<img :src="$withBase('/image/network/tcpip-illustrated/05/rarp_format_001.png')" alt="RARP 分组格式">
+<img :src="$withBase('/image/note/tcpip-illustrated/05/rarp_format_001.webp')" alt="RARP 分组格式">
 
 ```bash
 以太网帧类型代码 0x8035
@@ -478,10 +478,10 @@ RARP 服务器功能一般由用户进程提供.
 ### ICMP 控制报文协议
 
 **ICMP 报文封装**<br>
-<img :src="$withBase('/image/network/tcpip-illustrated/06/icmp_001.png')" alt="ICMP 报文封装">
+<img :src="$withBase('/image/note/tcpip-illustrated/06/icmp_001.webp')" alt="ICMP 报文封装">
 
 **ICMP 报文**<br>
-<img :src="$withBase('/image/network/tcpip-illustrated/06/icmp_002.png')" alt="ICMP 报文">
+<img :src="$withBase('/image/note/tcpip-illustrated/06/icmp_002.webp')" alt="ICMP 报文">
 
 ```bash
 0-7bit : ICMP 报文类型, 1-127 为差错报文, >=128 为信息报文
@@ -490,7 +490,7 @@ RARP 服务器功能一般由用户进程提供.
 ```
 
 **ICMP 消息类型**<br>
-<img :src="$withBase('/image/network/tcpip-illustrated/06/icmp_003.png')" alt="ICMP 消息类型">
+<img :src="$withBase('/image/note/tcpip-illustrated/06/icmp_003.webp')" alt="ICMP 消息类型">
 
 * 常见 ICMP 报文
 
@@ -535,10 +535,10 @@ RARP 服务器功能一般由用户进程提供.
 ### Ping
 
 **Ping Request**<br>
-<img :src="$withBase('/image/network/tcpip-illustrated/06/icmp_ping_001.png')" alt="Ping Request">
+<img :src="$withBase('/image/note/tcpip-illustrated/06/icmp_ping_001.webp')" alt="Ping Request">
 
 **Ping Response**<br>
-<img :src="$withBase('/image/network/tcpip-illustrated/06/icmp_ping_002.png')" alt="Ping Response">
+<img :src="$withBase('/image/note/tcpip-illustrated/06/icmp_ping_002.webp')" alt="Ping Response">
 
 ```bash
 ping 功能
@@ -550,22 +550,22 @@ ping 是在网络层, 没有端口的概念
 ### ICMP 相关应用
 
 **ICMP 路径 MTU 探索**<br>
-<img :src="$withBase('/image/network/tcpip-illustrated/06/icmp_004.png')" alt="ICMP 路径 MTU 探索">
+<img :src="$withBase('/image/note/tcpip-illustrated/06/icmp_004.webp')" alt="ICMP 路径 MTU 探索">
 
 **ICMP 改变路由**<br>
-<img :src="$withBase('/image/network/tcpip-illustrated/06/icmp_005.png')" alt="ICMP 改变路由">
+<img :src="$withBase('/image/note/tcpip-illustrated/06/icmp_005.webp')" alt="ICMP 改变路由">
 
 **ICMP 源点抑制**<br>
-<img :src="$withBase('/image/network/tcpip-illustrated/06/icmp_006.png')" alt="ICMP 源点抑制">
+<img :src="$withBase('/image/note/tcpip-illustrated/06/icmp_006.webp')" alt="ICMP 源点抑制">
 
 **ICMP Ping**<br>
-<img :src="$withBase('/image/network/tcpip-illustrated/06/icmp_007.png')" alt="ICMP Ping">
+<img :src="$withBase('/image/note/tcpip-illustrated/06/icmp_007.webp')" alt="ICMP Ping">
 
 **ICMP traceroute**<br>
-<img :src="$withBase('/image/network/tcpip-illustrated/06/icmp_008.png')" alt="ICMP traceroute">
+<img :src="$withBase('/image/note/tcpip-illustrated/06/icmp_008.webp')" alt="ICMP traceroute">
 
 **ICMP 端口扫描**<br>
-<img :src="$withBase('/image/network/tcpip-illustrated/06/icmp_009.png')" alt="ICMP 端口扫描">
+<img :src="$withBase('/image/note/tcpip-illustrated/06/icmp_009.webp')" alt="ICMP 端口扫描">
 
 > 只针对 UDP, TCP 可以通过建立连接来判断.<br>
 > 注意即使 ICMP 端口不可达报文没有返回, 也不能断定端口一定就开着.
@@ -585,16 +585,16 @@ ping 服务器一般在内核中实现 ICMP 功能.
 ### LAN Ping 示例
 
 **Ping ARP 请求**<br>
-<img :src="$withBase('/image/network/tcpip-illustrated/07/lan_ping_arp_001.png')" alt="Ping ARP 请求">
+<img :src="$withBase('/image/note/tcpip-illustrated/07/lan_ping_arp_001.webp')" alt="Ping ARP 请求">
 
 **Ping ARP 回复**<br>
-<img :src="$withBase('/image/network/tcpip-illustrated/07/lan_ping_arp_002.png')" alt="Ping ARP 回复">
+<img :src="$withBase('/image/note/tcpip-illustrated/07/lan_ping_arp_002.webp')" alt="Ping ARP 回复">
 
 **Ping ICMP 请求**<br>
-<img :src="$withBase('/image/network/tcpip-illustrated/07/lan_ping_icmp_001.png')" alt="Ping ICMP 请求">
+<img :src="$withBase('/image/note/tcpip-illustrated/07/lan_ping_icmp_001.webp')" alt="Ping ICMP 请求">
 
 **Ping ICMP 回复**<br>
-<img :src="$withBase('/image/network/tcpip-illustrated/07/lan_ping_icmp_002.png')" alt="Ping ICMP 回复">
+<img :src="$withBase('/image/note/tcpip-illustrated/07/lan_ping_icmp_002.webp')" alt="Ping ICMP 回复">
 
 ```bash
 1. 源主机发起 Ping 请求时, 会首先查询自己的 MAC 地址表(ARP 高速缓冲), 如果没有, 就需要发
@@ -631,19 +631,19 @@ ping 服务器一般在内核中实现 ICMP 功能.
 
 
 **Traceroute 流程**<br>
-<img :src="$withBase('/image/network/tcpip-illustrated/08/traceroute_001.png')" alt="Traceroute 流程">
+<img :src="$withBase('/image/note/tcpip-illustrated/08/traceroute_001.webp')" alt="Traceroute 流程">
 
 **Traceroute TTL 1**<br>
-<img :src="$withBase('/image/network/tcpip-illustrated/08/traceroute_002.png')" alt="Traceroute TTL 1">
+<img :src="$withBase('/image/note/tcpip-illustrated/08/traceroute_002.webp')" alt="Traceroute TTL 1">
 
 **Traceroute TTL 2**<br>
-<img :src="$withBase('/image/network/tcpip-illustrated/08/traceroute_003.png')" alt="Traceroute TTL 2">
+<img :src="$withBase('/image/note/tcpip-illustrated/08/traceroute_003.webp')" alt="Traceroute TTL 2">
 
 **Traceroute ICMP 超时**<br>
-<img :src="$withBase('/image/network/tcpip-illustrated/08/traceroute_004.png')" alt="Traceroute ICMP 超时">
+<img :src="$withBase('/image/note/tcpip-illustrated/08/traceroute_004.webp')" alt="Traceroute ICMP 超时">
 
 **Traceroute ICMP 端口不可达**<br>
-<img :src="$withBase('/image/network/tcpip-illustrated/08/traceroute_005.png')" alt="Traceroute 端口不可达">
+<img :src="$withBase('/image/note/tcpip-illustrated/08/traceroute_005.webp')" alt="Traceroute 端口不可达">
 
 * 指令
 

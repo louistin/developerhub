@@ -39,7 +39,7 @@
 * Unix 系统中, 文件和目录备被组织成树状结构
 
     **目录树**<br>
-    <img :src="$withBase('/image/os/uulp/01/dir_tree_001.png')" alt="目录树">
+    <img :src="$withBase('/image/note/uulp/01/dir_tree_001.webp')" alt="目录树">
 
     - 目录操作命令
         - `ls`

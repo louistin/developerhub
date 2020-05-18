@@ -548,10 +548,138 @@ FILE *fdopen(int fd, const char *mode);
 * 调用信号处理函数, 可能会随时打断主程序流程, 内核代表进程来调用处理函数, 函数返回时, 主程序会
   在中断的位置恢复执行
 
-
-
   **信号到达并执行处理器程序**<br>
   <img :src="$withBase('/image/note/tlpi/20_001_信号处理函数.webp')" alt="信号到达并执行处理器程序">
 
 ### 发送信号 `kill()`
 
+* 一个进程可以使用 `kill()` 系统调用向另一进程发送信号
+
+  ```cpp
+  #include <signal.h>
+
+  int kill(pid_t pid, int sig);
+  ```
+
+  * pid 参数是一个或多个目标进程, sig 指定要发送的信号
+    * pid > 0, 发送信号给 pid 指定的进程
+    * pid == 0, 发送信号给与调用进程同组的每个进程, 包括调用进程自身
+    * pid < -1, 向组 ID 等于该 pid 绝对值的进程组内所有下属进程发送信号
+    * pid == -1, 调用进程有权将信号发往每个目标进程, 除去 init 和调用进程自身. 这种信号发
+      送方式也称之为广播信号.
+  * 如果无进程与指定 pid 相匹配, `kill()` 调用失败, 同时将 errno 设置为 ESRCH
+  * 进程要发送信号给另一个进程, 需要适当的权限
+    * 特权级进程可以向任何进程发送信号
+    * 以 root 用户和组运行的 init 进程是一种特例, 仅能接收已安装了处理器函数的信号
+    * 如果发送者的实际或有效用户 ID 匹配于接受者的实际用户 ID 或者保存设置用户 ID, 那么非特
+      权进程也可以向另一进程发送信号
+    * SIGCONT 信号需要特殊处理
+  * 如果进程无权发送信号给所请求的 pid, 那么 kill() 调用将失败, 且将 errno 置为 EPERM
+
+### 检查进程的存在
+
+* 将 sig 参数指定为 0, 则无信号发送, 但 `kill()` 会去执行错误检查, 查看是否可以向目标进程
+  发送信号. 这样可以利用空信号检测具有特定进程 ID 的进程是否存在.
+  * 发送失败, 且 errno 为 ESRCH, 表明进程不存在
+  * 发送失败, 且 errno 为 EPERM, 或调用成功, 表示进程存在
+* 上述方式并不能保证特定程序仍在运行, 因为此进程 ID 有可能为重用
+
+> TODO: 这部分内容看的不是很明白
+
+### 发送信号的其他方式
+
+  ```cpp
+  #include <signal.h>
+
+  // 进程向自身发送信号, 立即执行
+  // sig 无效时发生错误 EINVAL
+  int raise(int sig);
+
+  // 向某一进程组的所有成员发送一个信号, pgrp 为 0 时, 向调用者所属的进程组的所有进程发送信号
+  int kill(pid_t pgrp, int sig);
+  ```
+
+### 显示信号描述
+
+  ```cpp
+  #define _GNU_SOURCE
+  #include <string.h>
+
+  // 返回指向针对该信号的可打印描述字符串, 或者当信号编号无效时指向错误字符串
+  // 信号描述位于数组 sys_siglist 中
+  char *strsignal(int sig);
+
+  #include <signal.h>
+
+  // 在标准错误输出上, 显示 msg 所给定的字符串 + ":" + 对应于 sig 的信号描述
+  void psignal(int sig, const char *msg);
+  ```
+
+### 信号集
+
+* 信号集, 可以表示多个信号的数据结构, 数据类型为 `sigset_t`
+
+  ```cpp
+  #include <signal.h>
+
+  // 两种初始化方式
+  // 初始化一个未包含任何成员的信号集
+  int sigemptyset(sigset_t *set);
+  // 初始化一个信号集, 包含所有实时信号
+  int sigfillset(sigset_t *set);
+
+  // 向集合中添加单个信号
+  int sigaddset(sigset_t *set, int sig);
+  // 从集合中删除单个信号
+  int sigdelset(sigset_t *set, int sig);
+
+  int sigismember(const sigset_t *set, int sig);
+
+  #define _GNU_SOURCE
+
+  int sigandset(sigset_t *set, sigset_t *left, sigset_t *right);
+  int sigorset(sigset_t *set, sigset_t *left, sigset_t *right);
+  int sigisemptyset(sigset_t *set);
+  ```
+
+### 信号掩码
+
+* 内核会为每个进程维护一个信号掩码, 并将阻塞其针对该进程的传递, 直到从进程信号掩码中移除该信号
+
+  ```cpp
+  #include <signal.h>
+
+  // how 指定函数想给信号掩码带来的变化
+  // SIG_BLOCK 将信号掩码这只为当前值和 set 的并集
+  // SIG_UNBLOCK 将 set 中的信号从信号掩码中移除
+  // SIG_SETMASK 将 set 指向的信号集赋给信号掩码
+  // set 为空则将忽略 how 参数
+  // lodset 不为空则指向一个 sigset_t 结构缓冲区, 返回之前的信号掩码
+  int sigprocmask(int how, const sigset_t *set, sigset_t *oldset);
+
+  // 系统会忽略试图阻塞 SIGKILL, SIGSTOP 的信号请求
+  // 以下将阻塞出 SIGKILL SIGSTOP 外的所有信号
+  sigfillset(&blockset);
+  if (sigprocmask(SIG_BLOCK, &blockset, NULL) == -1) {
+    perror("sigprocmask");
+  }
+  ```
+
+### 处于等待状态的信号
+
+* 进程接受了一个该进程正在阻塞的信号, 会将该信号添加到进程的等待信号集中, 解除阻塞后, 会将信号
+  传递给此进程
+
+  ```cpp
+  #include <signal.h>
+
+  // 获取处于等待状态的信号集
+  int sigpending(sigset_t *set);
+
+  #include <unistd.h>
+  // 暂停程序执行, 直到信号处理器函数中断该调用为止(或直到一个未处理信号终止进程为止)
+  int pause(void);
+  ```
+
+* 等待信号集只是一个掩码, 仅表明信号是否发生, 不表明发生次数. 同一信号在阻塞状态下, 即使发生
+  多次, 在解除阻塞后也只会传递一次

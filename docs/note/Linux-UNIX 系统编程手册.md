@@ -1040,6 +1040,9 @@ FILE *fdopen(int fd, const char *mode);
   #define MAX_BUF   1024
   #define MAX_EVENTS  8
 
+  // $ mkfifo p q
+  // $ ./demo_epoll p q     # 终端 1
+  // $ cat > p              # 终端 2
   int main(int argc, char const *argv[]) {
     int epfd, ready, fd, s, j, num_open_fds;
     struct epoll_event ev;

@@ -920,10 +920,44 @@ FILE *fdopen(int fd, const char *mode);
 * 优点
   * 检查大量文件描述符时, 性能比 `select()`, `poll()` 好
   * epoll API 既支持水平触发又支持边缘触发
+* epoll API 核心数据结构称为 epoll 实例.
+  * 记录了在进程中声明过的感兴趣的文件描述符列表 interest list
+  * 维护了处于 I/O 就绪态的文件描述符列表 ready list
+* `/proc/sys/fs/epoll/max_user_watches` 每个用户可以注册到 epoll 实例上的文件描述总数
 
   ```cpp
   #include <sys/epoll.h>
 
+  // 创建 epoll 实例
+  // size 指定想要通过 epoll 实例来检查的文件描述符个数, 不是上限, 只是告诉内核应该为内部
+  //      数据结构划分的初始大小
+  // 返回代表新创建的 epoll 实例的文件描述符. 用完需要 close()
   int epoll_create(int size);
-  
+  int epoll_create1(int flags);
+
+  typedef union epoll_data {
+    void *ptr;
+    int fd;
+    unit32_t u32;
+    unit64_t u64;
+  } epoll_data_t;
+
+  struct epoll_event {
+    unit32_t events;
+    epoll_data_t data;
+  };
+
+  // 修改 epoll 兴趣列表
+  // epfd epoll 实例
+  // fd 要修改的兴趣列表中的文件描述符, 可以为管道, FIFO, Socket, POSIX 消息队列,
+  //    inotify 实例, 总段, 设备, 另一个 epoll 实例的文件描述符
+  // op
+  //    EPOLL_CTL_ADD 向兴趣列表中添加 fd, 添加已存在 fd 则报错 EEXIST
+  //    EPOLL_CTL_MOD 修改 fd 设定事件, 使用 ev 指向的信息, 修改不存在 fd 则报错 ENOENT
+  //    EPOLL_CTL_DEL 从兴趣列表中删除 fd, 忽略参数 ev, 移除不存在 fd 则报错 ENOENT
+  //                  关闭文件描述符将会自动从所有 epoll 实例兴趣列表中移除
+  int epoll_ctl(int opfd, int op, int fd, struct epoll_event *ev);
+
+  // 事件等待
+  int epoll_wait();
   ```

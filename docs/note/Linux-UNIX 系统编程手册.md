@@ -683,3 +683,247 @@ FILE *fdopen(int fd, const char *mode);
 
 * 等待信号集只是一个掩码, 仅表明信号是否发生, 不表明发生次数. 同一信号在阻塞状态下, 即使发生
   多次, 在解除阻塞后也只会传递一次
+
+
+## 63 - 其他备选的 I/O 模型
+
+### 整体概览
+
+* 非阻塞式 I/O 可以让我们轮询某个文件内描述符上是否可以执行 I/O 操作. (轮询浪费 CPU)
+* 多进程/多线程能够同时检查多个文件描述符, 看其中任何一个是否可以执行 I/O 操作. (编程复杂)
+
+* I/O 模型
+  * I/O 多路复用允许进程同时检查多个文件描述符以找出其中的任何一个是否可以执行 I/O 操作.
+    * `select()`, `poll()`
+  * 信号驱动 I/O 当有输入或数据可写时, 内核向请求数据的进程发送一个信号. 检查大量文件描述符时
+    信号驱动 I/O 相比 `select()`, `poll()` 提升显著
+  * epoll API Linux 专有特性
+    * 能够让应用程序高效地检查大量文件描述符
+    * 同信号驱动 I/O 模型相比避免了处理信号的复杂性, 可以指定想要检查的事件类型, 可以选择水平
+      触发或边缘触发的进程通知形式
+  * 三个 I/O 模型都是用来实现 **同时检查多个文件描述符, 看 I/O 系统调用是否可以非阻塞执行**
+
+* 水平触发
+  * 如果文件描述符上可以非阻塞地执行 I/O 系统调用, 此时认为它已经就绪, 触发通知
+  * 收到通知时, 程序可以在任意时刻重复检查文件描述符的就绪状态
+  * `select()`, `poll()`, `epoll()`
+* 边缘触发
+  * 如果文件描述符自上次状态检查以来有了新的 I/O 活动, 此时就会触发通知
+  * 收到事件通知后, 程序在某个时刻应该在相应的文件描述符上尽可能多的执行 I/O
+  * 程序采用循环来对文件描述符执行尽可能多的 I/O 时, 每个被检查的文件描述符应该置于非阻塞模式,
+    在得到 I/O 事件通知后重复执行 I/O 操作, 直到相应的系统调用 `read()` `write()` 以错误
+    码 EAGAIN 或 EWOULDBLOCK 形式失败
+  * 信号驱动 I/O, `epoll()`
+
+### I/O 多路复用
+
+* `select()`
+
+  ```cpp
+  #include <sys/select.h>
+
+  // nfd 设置为 3 个文件描述符集所包含的最大文件描述符 + 1
+  // readfds 检测输入是否就绪的文件描述符集合
+  // writefds 检测输出是否就绪的文件描述符集合
+  // exceptfds 检测异常情况是否发生的文件描述符集合
+  //    异常包括: 流式套接字上接收到了带外数据; 连接到处于信包模式下的伪终端主设备上的从设备状态发生了改变
+  // timeout 控制 select() 阻塞行为
+  //    设置为 NULL 一直阻塞到有文件描述符就绪
+  //    设置为 0 只是简单轮询指定的文件描述符集, 查看是否有就绪的文件描述符并立刻返回
+  //    设置为大于 0 最长阻塞相应的时间
+  int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout);
+
+  void FD_ZERO(fd_set *fdset);    // 将 fdset 指向的集合初始化为空
+  void FD_SET(int fd, fd_set *fdset); // 将 fd 添加到 fdset
+  void FD_CLR(int fd, fd_set *fdset); // 将 fd 从 fdset 中移除
+  int FD_ISSET(int fd, fd_set *fdset);  // 判断 fd 是否为 fdset 成员
+  ```
+
+  * `fdset` 最大容量限制为 `FD_SETSIZE 1024`
+  * timeout 设置为非 0 值时, 返回条件是:
+    * 三个文件描述符集至少有一个就绪
+    * 该调用被信号处理例程中断
+    * timeout 超时
+  * `select()` 就绪返回或被信号中断, timeout 不为空时, 会被修改为表示剩余超时时间值
+  * `select()` 返回值
+    * -1 表示有错误发生
+      * EBADF 传入字符集中有一个文件描述符非法
+      * EINTR 该调用被信号处理例程中断
+    * 0 无文件描述符就绪, 调用超时
+    * `n > 0` 有 n 个文件描述符就绪. 同一文件描述符可以被多个信号集中被指定
+
+  * 编程示例
+
+    ```c
+    #include <sys/select.h>
+    #include <sys/time.h>
+    #include <stdio.h>
+
+    int main(int argc, char const *argv[]) {
+      fd_set readfds, writefds;
+      int ready, nfds, fd, num_read, j;
+      struct timeval timeout;
+      struct timeval *pto;
+      char buf[16];
+
+      // 修改 pto 值为 NULL 或 timeout 值为 0, 大于 0
+      pto = &timeout;
+      timeout.tv_sec = 0;
+      timeout.tv_usec = 0;
+
+      nfds = 0;
+      // readfds writefds 大小固定为 FD_SETSIZE
+      FD_ZERO(&readfds);
+      FD_ZERO(&writefds);
+
+      nfds = nfds > 0 ? nfds : 0 + 1;
+      FD_SET(0, &readfds);
+
+      nfds = nfds > 1 ? nfds : 1 + 1;
+      FD_SET(1, &writefds);
+
+      ready = select(nfds, &readfds, &writefds, NULL, pto);
+      if (ready == -1) {
+        perror("select");
+        return -1;
+      }
+
+      printf("ready: %d\n", ready);
+
+      for (fd = 0; fd < nfds; fd++) {
+        printf("%d: %s%s\n", fd, FD_ISSET(fd, &readfds) ? "r" : "", FD_ISSET(fd, &writefds) ? "w" : "");
+      }
+
+      if (pto != NULL) {
+        printf("timeout after select(): %ld.%03ld\n", (long) timeout.tv_sec, (long) timeout.tv_usec / 1000);
+      }
+
+      return 0;
+    }
+    ```
+    ```bash
+    [louis@louis 63]$ ./select
+    ready: 1
+    0:
+    1: w
+    timeout after select(): 9.999
+    ```
+
+    * 性能
+      * 适用场景
+        * 待检查的文件描述符范围较小(最大文件描述符号较低)
+        * 有大量的文件描述符待检查, 但分布很集中
+      * 存在的问题
+        * 每次调用时, 内核都必须检查所有被指定的文件描述符, 看其是否处于就绪态
+        * 每次调用, 程序都必须传递一个表示所有需要被检查的文件描述符的数据结构到内核, 内核检
+          查过描述符后, 修改这个数据结构并返回给程序. 这个数据结构的大小固定为 FD_SETSIZE
+        * 调用完成后, 程序必须检查返回的数据结构中的每个元素, 以确定哪个描述符处于就绪状态
+        * 随着待检查文件描述符的增加, CPU 资源占用也会随之增加
+
+* `poll()`
+
+  ```c
+  #include <poll.h>
+
+  struct pollfd {
+    int fd;
+    short events;
+    short revents;
+  };
+
+  // fds 需要检查的文件描述符数组
+  //    events 调用时初始化指定需要为描述符 fd 做检查的事件
+  //    revents 返回时表示该文件描述符上实际发生的事件
+  // nfds 指定数组 fds 中元素的个数
+  int poll(struct pollfd fds[], nfds_t nfds, int timeout);
+  ```
+
+  > TODO: 关于 `poll()` 的部分, 暂时不做过多讨论
+
+### 信号驱动 I/O
+
+* 信号驱动 I/O 中, 当文件描述符上可执行 I/O 操作时, 进程请求内核为自己发送一个信号. 之后进程
+  久可以执行任何其他任务直到 I/O 就绪位置, 此时内核会发送信号给进程.
+
+  * 编程范例
+
+    ```cpp
+    #include <signal.h>
+    #include <ctype.h>
+    #include <fcntl.h>
+    #include <unistd.h>
+    #include <stdio.h>
+    #include <string.h>
+
+    static volatile sig_atomic_t got_sigio = 0;
+
+    // 信号处理例程
+    static void sigio_handler(int sig) {
+      printf("sigio handler.\n");
+      got_sigio = 1;
+    }
+
+    int main(int argc, char const *argv[]) {
+      int flags, j, cnt;
+      char str[32];
+      char ch;
+      struct sigaction sa;
+      int done;
+
+      sigemptyset(&sa.sa_mask);
+      sa.sa_flags = SA_RESTART;
+      // 1. 为内核发送的通知信号安装一个信号处理例程
+      sa.sa_handler = sigio_handler;
+      if (sigaction(SIGIO, &sa, NULL) == -1) {
+        perror("sigaction");
+        return -1;
+      }
+
+      // 2. 设定文件描述符的属主, 即接收通知信号的进程或进程组
+      //    参数 pid 为负值时, 其绝对值为进程组 ID 号
+      if (fcntl(STDIN_FILENO, F_SETOWN, getpid()) == -1) {
+        perror("fcntl(F_SETOWN)");
+        return -1;
+      }
+
+      // 获取接收信号的进程或进程组 ID 号, 其中进程组 ID 号为负数
+      // id = fcntl(fd, F_GETOWN);
+
+      flags = fcntl(STDIN_FILENO, F_GETFL); // 获取当前 flags
+      // 3. 设定 O_NONBLOCK 使能非阻塞 I/O
+      //        O_ASYNC 使能信号驱动 I/O
+      if (fcntl(STDIN_FILENO, F_SETFL, flags | O_ASYNC | O_NONBLOCK) == -1) {
+        perror("fcntl(F_SETFL)");
+        return -1;
+      }
+
+      // TODO: 这里需要做什么暂时没搞清楚
+      // 5. 调用进程可以执行其他任务, 当 I/O 操作就绪时, 内核会为进程发送一个信号, 然后调用
+      //    1 中设置的信号处理例程
+
+      // 6. 信号驱动 I/O 是边缘触发通知, 一旦进程被通知 I/O 就绪, 应尽可能多的执行 I/O, 直到
+      // 系统调用失败位置, 此时错误码为 EAGAIN 或 EWOULDBLOCK
+      if (got_sigio) {
+        while (read(STDIN_FILENO, &ch, 1) > 0) {
+          printf("cnt = %d, read %c\n", cnt, ch);
+        }
+      }
+
+      return 0;
+    }
+    ```
+
+    > TODO: 信号驱动 I/O 暂时没看完
+
+### `epoll` 编程接口
+
+* 优点
+  * 检查大量文件描述符时, 性能比 `select()`, `poll()` 好
+  * epoll API 既支持水平触发又支持边缘触发
+
+  ```cpp
+  #include <sys/epoll.h>
+
+  int epoll_create(int size);
+  
+  ```

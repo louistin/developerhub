@@ -924,6 +924,8 @@ FILE *fdopen(int fd, const char *mode);
   * 记录了在进程中声明过的感兴趣的文件描述符列表 interest list
   * 维护了处于 I/O 就绪态的文件描述符列表 ready list
 * `/proc/sys/fs/epoll/max_user_watches` 每个用户可以注册到 epoll 实例上的文件描述总数
+* 多线程程序中, 可以在一个线程中使用 `epoll_ctl()` 将文件描述符添加到另一个线程中由 `epoll_wait`
+  所监视的 epoll 实例的兴趣列表中.
 
   ```cpp
   #include <sys/epoll.h>
@@ -943,7 +945,7 @@ FILE *fdopen(int fd, const char *mode);
   } epoll_data_t;
 
   struct epoll_event {
-    unit32_t events;
+    unit32_t events;  // 该描述符上已经发生的事件掩码
     epoll_data_t data;
   };
 
@@ -959,5 +961,165 @@ FILE *fdopen(int fd, const char *mode);
   int epoll_ctl(int opfd, int op, int fd, struct epoll_event *ev);
 
   // 事件等待
-  int epoll_wait();
+  // epfd epoll 实例
+  // evlist 就绪文件描述符(空间由调用这申请, 包含元素个数为 maxevents)
+  // timeout 确定阻塞行为
+  //    -1, 调用一直阻塞, 直到兴趣列表中文件描述符上有事件产生或捕获到一个信号
+  //     0, 执行一次非阻塞式检查, 查看兴趣列表中的文件描述符上产生了哪个事件
+  //   > 0, 阻塞至多 timeout 毫秒, 直到兴趣列表中文件描述符上有事件产生或捕获到一个信号
+  // 调用成功返回数组 evlist 中元素个数; 没有就绪的返回 0; 出错返回 -1, 并在errno 中设定错误码
+  int epoll_wait(int epfd, struct epoll_event *evlist, int maxevents, int timeout);
+  ```
+
+* epoll 事件
+
+  **epoll 中 events 字段上的位掩码值**<br>
+  <img :src="$withBase('/image/note/tlpi/63_epoll_events_mask.webp')" alt="epoll 中 events 字段上的位掩码值">
+
+  * EPOLLONESHOT
+    * 文件描述符处于就绪后, 就会在兴趣列表中被标记为非激活状态(未被删除), 直到通过
+      `epoll_ctl() EPOLL_CTL_MOD` 再次激活
+
+* 深入探究 epoll
+  * 当 `epoll_create()` 创建一个 epoll 实例时, 内核在内存中创建一个新的 i-node 并打开文
+    件描述 file description (打开文件的上下文信息数据结构, 由内核管理), 随后在调用进程中为
+    打开的这个文件描述分配一个新的文件描述符 file discriptor (一个整数, 用户空间). 同 epoll
+    实例的兴趣列表相关联的是打开的文件描述, 而不是 epoll 文件描述符.
+    * 当使用 `dup()` 复制一个 epoll 文件描述符, 那么被复制的文件描述符所指代的 epoll 兴趣
+      列表和就绪列表同原始的 epoll 文件描述符相同. 二者通过 `epoll_ctl()` 操作的效果一致
+    * `fork()` 调用后, 子进程通过继承复制了父进程的 epoll 文件描述符, 效果同上
+  * 执行 `epoll_ctl()` 的 EPOLL_CTL_ADD 操作时, 内核在 epoll 兴趣列表中添加一个元素,
+    这个元素同时记录了需要检查的文件描述符数量(多个文件描述符可以对应一个文件描述)以及对应的打
+    开文件描述的引用
+  * `epoll_wait()` 调用的目的就是让内核负责监视打开的文件描述. 一旦所有指向打开的文件描述的
+    文件描述符都被关闭后, 这个打开的文件描述将从 epoll 的兴趣列表中移除
+
+* epoll 同 I/O 多路复用的性能对比
+  * 每次调用 select/poll 时, 内核必须检查所有在调用中指定的文件描述符.<br>
+    当通过 `epoll_ctl()` 指定了需要监视的文件描述符时, 内核会在与打开的文件描述符上下文相关
+    联的列表中记录该描述符. 之后每当执行 I/O 操作使得文件描述符称为就绪态时, 内核就在 epoll
+    描述符的就绪列表中添加一个元素. 之后 `epoll_wait()` 调用就从就绪列表中简单的取出这些元素
+  * 每次调用 select/poll 时, 我们传递一个标记hi了所有待监视的文件描述符的数据结构给内核, 调
+    用返回时, 内核将所有标记为就绪态的文件描述符的数据结构再传给我们.<br>
+    epoll 中使用 `epoll_ctl()` 在内核空间中建立一个数据结构, 该数据结构会将待监视的文件描
+    述符都记录下来, 一旦这个数据结构建立完成, 后面每次调用 `epoll_wait()` 时就不需要再传递
+    任何与文件描述符有关的信息给内核, 调用返回的信息中只包含那些已经处于就绪态的描述符
+  * select 每次调用前需要先初始化输入数据, select/poll 都必须对返回的数据结构做检查, 以找出
+    N 个文件描述符中哪些是处于就绪态的<br>
+    epoll 调用返回的信息中只包含那些已经处于就绪态的描述符
+
+* 边缘触发通知
+  * 默认情况下 epoll 提供的是水平触发通知, epoll 会告诉我们何时能在文件描述符上以非阻塞的方
+    式执行 I/O 操作
+  * 边缘触发方式
+    * 告诉我们自上一次调用 `epoll_wait()` 以来文件描述符上是都已经有 I/O 活动了
+    * 如果有多个 I/O 事件发生的话, epoll 会将其合并成一次单独通知, 通过 `epoll_wait()` 返回
+  * 水平触发与边缘触发区别
+    * 当对就绪的文件描述符再次调用 `epoll_wait()`, 水平触发机制将会告诉我们套接字处于就绪
+      状态; 边缘触发机制 `epoll_wait()` 调用将会阻塞
+  * 边缘触发通知机制程序基本框架
+    * 让所有待监视的文件描述符都成为非阻塞的
+    * 通过 `epoll_ctl()` 构建 epoll 的兴趣列表
+    * 通过如下的循环处理 I/O 事件
+      * 通过 `epoll_wait()` 取得处于就绪态的描述符列表
+      * 针对每一个处于就绪态的文件描述符, 不断进行 I/O 处理直到相关的系统调用(`read()`, `write()`,
+        `recv()`, `send()`, `accept()`) 返回 EAGAIN 或 EWOULDBLOCK 错误
+  * 采用边缘触发机制时避免出现文件描述符饥饿现象
+    * 调用 `epoll_wait()` 监视文件描述符, 并将处于就绪态的描述符添加到应用程序维护的列表中
+    * 在应用程序维护的列表中, 只在那些已经注册为就绪态的文件描述符上进行一定限度的 I/O 操作,
+      当相关的非阻塞 I/O 系统调用出现 EAGAIN 或 EWOULDBLOCK 错误时, 文件描述符就可以在应
+      用程序维护的列表中移除
+
+  ```cpp
+  #include <sys/epoll.h>
+  #include <fcntl.h>
+  #include <stdio.h>
+  #include <string.h>
+  #include <errno.h>
+
+  #define MAX_BUF   1024
+  #define MAX_EVENTS  8
+
+  int main(int argc, char const *argv[]) {
+    int epfd, ready, fd, s, j, num_open_fds;
+    struct epoll_event ev;
+    struct epoll_event evlist[MAX_EVENTS];
+    char buf[MAX_BUF];
+
+    if (argc < 2 || strcasecmp(argv[1], "--help") == 0) {
+      printf("usage: %s file ...\n", argv[0]);
+      return -1;
+    }
+
+    epfd = epoll_create(argc - 1);
+    if (epfd == -1) {
+      printf("epoll_create error.\n");
+      return -1;
+    }
+
+    for (j = 1; j < argc; j++) {
+      fd = open(argv[j], O_RDONLY);
+      if (fd == -1) {
+        printf("open %s error.\n", argv[j]);
+        return -1;
+      }
+
+      printf("opened \"%s\" on fd %d.\n", argv[j], fd);
+
+      ev.events = EPOLLIN;
+      ev.data.fd = fd;
+      if (epoll_ctl(epfd, EPOLL_CTL_ADD, fd, &ev) == -1) {
+        printf("epoll_ctl error.\n");
+        return -1;
+      }
+
+      num_open_fds = argc - 1;
+
+      while (num_open_fds > 0) {
+        printf("about to epoll_wait()\n");
+
+        ready = epoll_wait(epfd, evlist, MAX_EVENTS, -1);
+        if (ready == -1) {
+          if (errno == EINTR) {
+            continue;
+          } else {
+            printf("epoll_wait error.\n");
+            return -1;
+          }
+        }
+
+        printf("ready: %d\n", ready);
+
+        for (j = 0; j < ready; j++) {
+          printf("  fd = %d; events: %s%s%s\n", evlist[j].data.fd,
+                  (evlist[j].events & EPOLLIN) ? "EPOLLIN " : "",
+                  (evlist[j].events & EPOLLHUP) ? "EPOLLHUP " : "",
+                  (evlist[j].events & EPOLLERR) ? "EPOLLERR " : "");
+
+          if (evlist[j].events & EPOLLIN) {
+            s = read(evlist[j].data.fd, buf, MAX_BUF);
+            if (s == -1) {
+              printf("read error.\n");
+              return -1;
+            }
+
+            printf("    read %d bytes: %.*s\n", s, s, buf);
+
+          } else if (evlist[j].events & (EPOLLHUP | EPOLLERR)) {
+            printf("    closing fd %s\n", evlist[j].data.fd);
+            if (close(evlist[j].data.fd) == -1) {
+              printf("close error.\n");
+              return -1;
+            }
+
+            num_open_fds--;
+          }
+        }
+      }
+    }
+
+    printf("all file description closed; bye\n");
+
+    return 0;
+  }
   ```

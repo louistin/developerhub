@@ -32,12 +32,20 @@ module.exports = {
                     ]
                 },
                 {
+                    title: '设计模式',
+                    collapsable: true,
+                    children: [
+                        "/cs/design-pattern/Reactor 反应堆模式"
+                    ]
+                },
+                {
                     title: '数据库',
                     collapsable: true,
                     children: [
                         "/cs/database/MySQL 手册"
                     ]
                 },
+
                 // {
                 //     title: 'C/C++',
                 //     collapsable: true,

@@ -56,29 +56,22 @@ module.exports = {
 
             '/network': [
                 {
-                    title: 'TCP/IP',
+                    title: '套接字网络 API',
                     collapsable: true,
                     children: [
-                        "/network/tcpip/",
-                        "/network/tcpip/TCP 协议",
-                        "/network/tcpip/UDP 协议",
-                        "/network/tcpip/DNS 协议"
+                        "/network/socket-api/",
+                        "/network/socket-api/TCP 协议",
+                        "/network/socket-api/UDP 协议",
+                        "/network/socket-api/DNS 协议"
                     ]
                 },
-                // {
-                //     title: 'Socket',
-                //     collapsable: true,
-                //     children: [
-                //         "/network/socket/"
-                //     ]
-                // },
-                // {
-                //     title: 'HTTP',
-                //     collapsable: true,
-                //     children: [
-                //         "/network/http/"
-                //     ]
-                // }
+                {
+                    title: '进程间通信',
+                    collapsable: true,
+                    children: [
+                        "/network/ipc/"
+                    ]
+                }
             ],
 
             '/web/': [

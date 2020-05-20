@@ -28,14 +28,14 @@ module.exports = {
                     title: '数据结构与算法',
                     collapsable: true,
                     children: [
-                        "/cs/dsa/"
+                        "/cs/dsa/数据结构与算法"
                     ]
                 },
                 {
                     title: '数据库',
                     collapsable: true,
                     children: [
-                        "/cs/database/"
+                        "/cs/database/MySQL 手册"
                     ]
                 },
                 // {
@@ -59,7 +59,6 @@ module.exports = {
                     title: '套接字网络 API',
                     collapsable: true,
                     children: [
-                        "/network/socket-api/",
                         "/network/socket-api/TCP 协议",
                         "/network/socket-api/UDP 协议",
                         "/network/socket-api/DNS 协议"
@@ -69,7 +68,6 @@ module.exports = {
                     title: '进程间通信',
                     collapsable: true,
                     children: [
-                        "/network/ipc/"
                     ]
                 }
             ],
@@ -100,7 +98,6 @@ module.exports = {
                     title: 'FAQ',
                     collapsable: true,
                     children: [
-                        "/web/faq/",
                         "/web/faq/HTTP 跨域处理"
                     ]
                 }
@@ -132,7 +129,6 @@ module.exports = {
                     title: 'Others',
                     collapsable: true,
                     children: [
-                        "/opensource/others/",
                         "/opensource/others/Easylogger Linux 平台静态库编译"
                     ]
                 }
@@ -152,7 +148,7 @@ module.exports = {
                     title: 'Windows 开发环境',
                     collapsable: true,
                     children: [
-                        "/manual/windows/",
+                        "/manual/windows/Windows 环境配置指南",
                         "/manual/windows/FFMPEG x265 Windows 编译"
                     ]
                 },
@@ -160,7 +156,7 @@ module.exports = {
                     title: 'Linux 开发环境',
                     collapsable: true,
                     children: [
-                        "/manual/linux/",
+                        "/manual/linux/CentOS 最小化配置安装",
                         "/manual/linux/RHEL 8 前端开发环境搭建指南",
                         "/manual/linux/CentOS dokuwiki 安装指南",
                         "/manual/linux/网站自动化布署",
@@ -174,7 +170,7 @@ module.exports = {
                     title: '开发杂谈',
                     collapsable: true,
                     children: [
-                        "/manual/discuz/",
+                        "/manual/discuz/开发技能树",
                         "/manual/discuz/2020 书单"
                     ]
                 }

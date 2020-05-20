@@ -754,7 +754,7 @@ FILE *fdopen(int fd, const char *mode);
 
   * 编程示例
 
-    ```c
+    ```cpp
     #include <sys/select.h>
     #include <sys/time.h>
     #include <stdio.h>
@@ -962,7 +962,7 @@ FILE *fdopen(int fd, const char *mode);
 
   // 事件等待
   // epfd epoll 实例
-  // evlist 就绪文件描述符(空间由调用这申请, 包含元素个数为 maxevents)
+  // evlist 就绪文件描述符(空间由调用者申请, 包含元素个数为 maxevents)
   // timeout 确定阻塞行为
   //    -1, 调用一直阻塞, 直到兴趣列表中文件描述符上有事件产生或捕获到一个信号
   //     0, 执行一次非阻塞式检查, 查看兴趣列表中的文件描述符上产生了哪个事件

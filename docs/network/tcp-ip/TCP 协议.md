@@ -2,7 +2,7 @@
 > 利用 wireshark 软件分析三次握手与四次挥手
 
 * wireshark 抓包与协议分层
-    <img :src="$withBase('/image/network/tcp_basic_wireshark_001.png')" alt="TCP 与分层协议">
+    <img :src="$withBase('/image/network/tcp-ip/001_tcp_basic_wireshark_001.webp')" alt="TCP 与分层协议">
 
 ## TCP 协议基础
 
@@ -35,23 +35,23 @@
     TCP Flags : 包的类型, 用于操控 TCP 的状态机
     ```
 
-    <img :src="$withBase('/image/network/tcp_header_001.jpg')" alt="TCP Header">
+    <img :src="$withBase('/image/network/tcp-ip/001_tcp_header_001.webp')" alt="TCP Header">
 
-    <img :src="$withBase('/image/network/tcp_basic_wireshark_002.png')" alt="TCP 与分层协议">
+    <img :src="$withBase('/image/network/tcp-ip/001_tcp_basic_wireshark_002.webp')" alt="TCP 与分层协议">
 
 * TCP 状态机
 
     TCP 所谓的连接, 其实是通讯双方维护的一个 **连接状态**, 使其看起来好像连接一样.
 
 
-    <img :src="$withBase('/image/network/tcp_statemachine_001.png')" alt="TCP 状态机">
+    <img :src="$withBase('/image/network/tcp-ip/001_tcp_statemachine_001.webp')" alt="TCP 状态机">
 
 * 三次握手
 
-    <img :src="$withBase('/image/network/tcp_connect_wireshark_001.png')" alt="TCP 三次握手">
+    <img :src="$withBase('/image/network/tcp-ip/001_tcp_connect_wireshark_001.webp')" alt="TCP 三次握手">
 
     **第一次握手**<br>
-    <img :src="$withBase('/image/network/tcp_connect_wireshark_002.png')" alt="TCP 第一次握手">
+    <img :src="$withBase('/image/network/tcp-ip/001_tcp_connect_wireshark_002.webp')" alt="TCP 第一次握手">
 
     ```bash
     Client 将标志位 SYN 置为 1, 随机产生一个值 seq = J
@@ -59,7 +59,7 @@
     ```
 
     **第二次握手**<br>
-    <img :src="$withBase('/image/network/tcp_connect_wireshark_003.png')" alt="TCP 第二次握手">
+    <img :src="$withBase('/image/network/tcp-ip/001_tcp_connect_wireshark_003.webp')" alt="TCP 第二次握手">
 
     ```bash
     Server 收到数据包后由标志位 SYN = 1 知道 Client 请求建立连接, Server 将标志位 SYN
@@ -68,7 +68,7 @@
     ```
 
     **第三次握手**<br>
-    <img :src="$withBase('/image/network/tcp_connect_wireshark_004.png')" alt="TCP 第三次握手">
+    <img :src="$withBase('/image/network/tcp-ip/001_tcp_connect_wireshark_004.webp')" alt="TCP 第三次握手">
 
     ```bash
     Client 收到数据包, 检查 ack 是否为 J + 1, 正确则将标志位 ACK 值置为 1, ack = K + 1
@@ -108,7 +108,7 @@
 
 * 四次挥手
 
-    <img :src="$withBase('/image/network/tcp_close_wireshark_001.png')" alt="TCP 四次挥手">
+    <img :src="$withBase('/image/network/tcp-ip/001_tcp_close_wireshark_001.webp')" alt="TCP 四次挥手">
 
     ```bash
     TCP 连接为全双工, 可以由任一方发起关闭. 同时每一个方向都必须单独关闭.
@@ -118,14 +118,14 @@
     ```
 
     **第一次挥手**<br>
-    <img :src="$withBase('/image/network/tcp_close_wireshark_002.png')" alt="TCP 第一次挥手">
+    <img :src="$withBase('/image/network/tcp-ip/001_tcp_close_wireshark_002.webp')" alt="TCP 第一次挥手">
 
     ```bash
     Client 发送 FIN, 关闭 Client 到 Server 的数据传输, Client 进入 FIN_WAIT_1 状态
     ```
 
     **第二三次挥手**<br>
-    <img :src="$withBase('/image/network/tcp_close_wireshark_003.png')" alt="TCP 第二三次挥手">
+    <img :src="$withBase('/image/network/tcp-ip/001_tcp_close_wireshark_003.webp')" alt="TCP 第二三次挥手">
 
     ```bash
     这里的第二次, 第三次挥手在一个数据包中 (如果此时 Server 还有数据要发送, 就不能合并)
@@ -135,7 +135,7 @@
     ```
 
     **第四次挥手**<br>
-    <img :src="$withBase('/image/network/tcp_close_wireshark_004.png')" alt="TCP 第四次挥手">
+    <img :src="$withBase('/image/network/tcp-ip/001_tcp_close_wireshark_004.webp')" alt="TCP 第四次挥手">
 
     ```bash
     Client 收到 FIN 后, 进入 TIME_WAIT 状态, 再发送一个 ACK 给 Server, 确认序列号 ack
@@ -154,7 +154,6 @@
       TCP 重传机制中 Timeout 设置
           时间过长, 重发变慢, 效率低, 性能差
           时间过短, 可能导致重发未丢失的包, 增加网络拥塞, 导致更多超时
-      
       ```
 ---
 

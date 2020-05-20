@@ -66,8 +66,8 @@
 
     **IP 地址分类**<br>
 
-    <img :src="$withBase('/image/network/ip_address_001.png')" alt="IP 地址分类">
-    <img :src="$withBase('/image/network/ip_address_002.png')" alt="IP 地址分类">
+    <img :src="$withBase('/image/network/readme_ip_address_001.webp')" alt="IP 地址分类">
+    <img :src="$withBase('/image/network/readme_ip_address_002.webp')" alt="IP 地址分类">
 
     ```bash
     网络地址 = Network ID + Host ID
@@ -172,7 +172,7 @@
 * Ping
 
     **ICMP 协议**<br>
-    <img :src="$withBase('/image/network/icmp_001.jpg')" alt="ICMP 协议">
+    <img :src="$withBase('/image/network/readme_icmp_001.webp')" alt="ICMP 协议">
 
     ```bash
     基于 ICMP 协议工作, 探测本机与网络中另一台主机之间是否可达的命令
@@ -240,7 +240,7 @@
 * Socket 读写
 
     **Socket 读写**<br>
-    <img :src="$withBase('/image/network/socket_rdwr_001.gif')" alt="Socket 读写">
+    <img :src="$withBase('/image/network/readme_socket_rdwr_001.gif')" alt="Socket 读写">
 
     ```bash
     read buffer, write buffer
@@ -321,11 +321,11 @@
 * TCP 三次握手 四次挥手
 
     **三次握手 四次挥手**<br>
-    <img :src="$withBase('/image/network/tcp001.jpg')" alt="TCP 三次握手 四次挥手">
+    <img :src="$withBase('/image/network/readme_tcp001.webp')" alt="TCP 三次握手 四次挥手">
 
     **三次握手**<br>
-    <img :src="$withBase('/image/network/tcp_connect001.gif')" alt="TCP 三次握手状态">
-    <img :src="$withBase('/image/network/tcp_connect002.gif')" alt="TCP 三次握手状态">
+    <img :src="$withBase('/image/network/readme_tcp_connect001.gif')" alt="TCP 三次握手状态">
+    <img :src="$withBase('/image/network/readme_tcp_connect002.gif')" alt="TCP 三次握手状态">
     ```bash
     半打开状态:
         syn_sent
@@ -333,8 +333,8 @@
     ```
 
     **数据传输**<br>
-    <img :src="$withBase('/image/network/tcp_data001.gif')" alt="TCP 数据传输">
-    <img :src="$withBase('/image/network/tcp_data002.gif')" alt="TCP 数据传输">
+    <img :src="$withBase('/image/network/readme_tcp_data001.gif')" alt="TCP 数据传输">
+    <img :src="$withBase('/image/network/readme_tcp_data002.gif')" alt="TCP 数据传输">
     ```bash
     TCP 连接是双工的, 无论哪方都可以主动发起数据传输, 同时也都需要对方回复 ACK 确认
     数据发送与接收双方需要协商合适的发送与接收速率, 即 TCP 窗口大小
@@ -342,8 +342,8 @@
     ```
 
     **四次挥手**<br>
-    <img :src="$withBase('/image/network/tcp_disconnect001.gif')" alt="TCP 四次挥手状态">
-    <img style="width: 40%" :src="$withBase('/image/network/tcp_disconnect002.gif')" alt="TCP 四次挥手状态">
+    <img :src="$withBase('/image/network/readme_tcp_disconnect001.gif')" alt="TCP 四次挥手状态">
+    <img style="width: 40%" :src="$withBase('/image/network/readme_tcp_disconnect002.gif')" alt="TCP 四次挥手状态">
     ```bash
     半关闭状态(主动关闭方发起关闭后, 并没有立刻关闭)
     time_wait 状态
@@ -405,8 +405,8 @@
 
 ## HTTP
 
-<img :src="$withBase('/image/network/httprequest001.png')" alt="HTTP 请求">
-<img :src="$withBase('/image/network/httpresponse001.png')" alt="HTTP 响应">
+<img :src="$withBase('/image/network/readme_httprequest001.webp')" alt="HTTP 请求">
+<img :src="$withBase('/image/network/readme_httpresponse001.webp')" alt="HTTP 响应">
 
 * 概念
     ```bash

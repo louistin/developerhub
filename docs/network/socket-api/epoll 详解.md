@@ -147,6 +147,20 @@
 
 * 进程调用 `epoll_create()` 时, 内核会创建一个 eventpoll 对象(即 epfd 指向的对象).
   eventpoll 是文件系统中的一员, 有自己的等待队列
+* 每一个 epoll 对象都有一个独立的 eventpoll 结构体, 用于存放通过 `epoll_ctl()` 添加进来
+  的事件. 这些事件都挂载在红黑树上, 重复添加事件时可以通过红黑树高效识别出来(红黑树插入效率
+   lgN, N 为树的高度)
+
+  ```cpp
+  struct eventpoll{
+    ....
+    // 红黑树的根节点, 这颗树中存储着所有添加到 epoll 中的需要监控的事件
+    struct rb_root  rbr;
+    // 双链表中则存放着将要通过 epoll_wait 返回给用户的满足条件的事件
+    struct list_head rdlist;
+    ....
+  };
+  ```
 
   **内核创建 eventpoll 对象**<br><img :src="$withBase('/image/network/socket-api/001_epoll_create_eventpoll.webp')" alt="内核创建 eventpoll 对象">
 
@@ -155,6 +169,20 @@
 * 创建 epoll 对象后, 可以使用 `epoll_ctl()` 管理所要监听的 socket, 内核会将 eventpoll
   添加到对应 socket 的等待队列, 或从所在的 socket 等待队列删除
 * 当 socket 收到数据后, 中断程序会操作 eventpoll 对象, 而不是直接操作进程
+  * 所有添加到 epoll 的事件都会与设备网卡驱动程序建立回调关系, 当相应的事件发生时会调用这个
+    回调方法. 这个回调方法在内核中叫 `ep_poll_callback`, 会将发生的事件添加到 rdlist 链
+    表中
+  * epoll 中, 对于每个事件, 都会建立一个 epitem 结构体
+
+  ```cpp
+  struct epitem{
+    struct rb_node rbn;  //红黑树节点
+    struct list_head rdllink; //双向链表节点
+    struct epoll_filefd ffd;  //事件句柄信息
+    struct eventpoll *ep;     //指向其所属的 eventpoll 对象
+    struct epoll_event event; //期待发生的事件类型
+  };
+  ```
 
   **添加要监听的 socket**<br><img :src="$withBase('/image/network/socket-api/001_epoll_add_rdlist.webp')" alt="添加要监听的 socket">
 
@@ -165,6 +193,9 @@
   过改变 eventpoll 的 rdlist 来改变进程状态
 * 当程序执行 `epoll_wait()` 时, 如果 rdlist 已经引用了 socket, 那么 `epoll_wait()`
   直接返回, 如果 rdlist 为空则进程阻塞
+  * 调用 `epoll_wait()` 检查是否有事件发生时, 只需要检查 eventpoll.rdlist 双链表中是否
+    有 epitem 元素即可. 如果 rdlist 不为空, 则把发生的事件复制到用户态, 同时将事件数量返回
+    给用户
 
   **给 rdlist 添加引用**<br><img :src="$withBase('/image/network/socket-api/001_epoll_rdlist_add_reference.webp')" alt="给 rdlist 添加引用">
 
@@ -212,7 +243,33 @@
   * 红黑树, 快速添加, 删除, 搜索
   * 保存监视的 socket
 
-  **epoll 原理**<br><img :src="$withBase('/image/network/socket-api/001_epoll_principle.webp')" alt="epoll 原理">
+  **epoll 原理**<br><img :src="$withBase('/image/network/socket-api/001_epoll_datastructure.webp')" alt="epoll 原理">
+
+***Q. 为什么能支持百万句柄如此高效?***
+
+* **不用重复传递**, 调用 `epoll_wait()` 就相当于调用 `selelct/poll`, 但此时不用传递
+  socket 句柄给内核, 因为内核已经在 `epoll_ctl()` 中拿到了要监控的句柄列表
+* 内核中, 一切皆文件. epoll 向内核注册了一个文件系统, 用于存储被监控的 socket. 当调用
+  `epoll_create()` 时, 就会在这个虚拟的 epoll 文件系统中创建一个 file 节点, 这个节点
+  不时普通的文件, 只服务于 epoll. epoll 在被内核初始化时, 同时会开辟出 epoll 自己的内核
+  高速 cache, 用于存放每一个想要监控的 socket, 这些 socket 会以红黑树的形式保存在内存
+  cache 中, 以支持快速的查抄, 删除, 插入. 所以在内存上分配好想要的 size 的内存对象, 每次
+  使用时都是使用空闲的已分配好的对象
+* 高效原因. 内核除了在 epoll 文件系统中创建 file 节点, 在内核 cache 中建立红黑树以存储后
+  续 `epoll_ctl()` 传来的 socket 外, 还会再建一个 list 链表, 用于存储准备就绪的事件,
+  `epoll_wait()` 时, 仅仅观察这个 list 链表里有没有数据即可. 有数据就返回, 没有数据就
+  sleep, 等到 timeout 时间到后即使链表没有数据也返回.
+  * rdlist 维护. **epoll 的基础就是回调**. 执行 `epoll_ctl()` 时, 除了把 socket 放到
+    epoll 文件系统里 file 对象对应的红黑树上, 还会给内核中断处理程序注册一个回调函数, 使得
+    内核在这个句柄中断到了时, 将它放到准备就绪 rdlist 里. 所以当一个 socket 上有数据时,
+    内核把网卡上的数据 copy 到内核中后, 就会将 socket 插入到 rdlist 中.
+* 总结下流程
+  1. `epoll_create()` 创建红黑树和 rdlist
+  2. `epoll_ctl()` 增加 socket 句柄时, 检查红黑树中是否存在, 存在就立即返回, 不存在则添加
+      到树干上; 然后向内核注册回调函数, 用于当中断事件来临时向 rdlist 中插入数据
+  3. `epoll_wait()` 立刻返回 rdlist 中的数据
+
 
 ## 参考资料
 [如果这篇文章说不清 epoll 的本质, 那就过来掐死我吧!](https://zhuanlan.zhihu.com/p/63179839)
+[epoll的内部实现 & 百万级别句柄监听 & lt和et模式非常好的解释](https://www.cnblogs.com/charlesblc/p/6242479.html)

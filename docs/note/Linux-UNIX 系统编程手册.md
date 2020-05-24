@@ -1126,3 +1126,23 @@ FILE *fdopen(int fd, const char *mode);
     return 0;
   }
   ```
+
+### 在信号和文件描述符上等待
+
+同时等待信号和文件描述符状态.
+
+* `pselect()`
+
+  ```cpp
+  #define _XOPEN_SOURCE 600
+  #include <sys/select.h>
+
+  // timeout 允许时间精度为纳秒
+  // sigmask 指定了当调用被阻塞时哪些信号可以不被过滤掉
+  // 返回时不会修改 timeout
+  int pselect(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
+              struct timespec *timeout, const sigset_t sigmask);
+  ```
+
+* self-pipe 技巧
+  * 参考 libevent 中的信号事件转 I/O 事件处理方式

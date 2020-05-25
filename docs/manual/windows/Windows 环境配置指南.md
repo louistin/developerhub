@@ -59,3 +59,10 @@ git config --global core.autocrlf false
 # 添加换行符检查, 提交时发现混用禁止提交
 git config --global core.safecrlf true
 ```
+
+### Beyond Compare
+
+```bash
+# 解决试用期满问题, 注册表直接删除下列选项
+Computer\HKEY_CURRENT_USER\Software\ScooterSoftware\Beyond Compare 4\CacheId
+```

@@ -271,5 +271,5 @@
 
 
 ## 参考资料
-[如果这篇文章说不清 epoll 的本质, 那就过来掐死我吧!](https://zhuanlan.zhihu.com/p/63179839)
+[如果这篇文章说不清 epoll 的本质, 那就过来掐死我吧!](https://zhuanlan.zhihu.com/p/63179839)<br>
 [epoll的内部实现 & 百万级别句柄监听 & lt和et模式非常好的解释](https://www.cnblogs.com/charlesblc/p/6242479.html)

@@ -237,6 +237,132 @@ nonvoluntary_ctxt_switches:     40
 ```
 
 
+## 03 - 系统编程概念
+
+无论何时, 只要执行了系统调用或者库函数, 就必须检查调用的返回状态以确定调用是否成功.
+
+### 系统调用
+
+* 内核以应用程序编程接口 API 的形式, 提供一系列服务供程序访问.
+* 系统调用将处理器从用户态切换到内核态, 以便 CPU 访问受保护的内核内存
+* 系统调用的组成是固定的, 每个系统调用都由一个唯一的数字标识(程序不可知)
+* 每个系统调用可辅之一套参数, 对用户空间和内核空间之间传递的信息加以规范
+
+**系统调用的执行步骤**<br>
+<img :src="$withBase('/image/note/tlpi/03_001_系统调用的执行步骤.webp')" alt="系统调用的执行步骤">
+
+**系统调用的执行步骤**<br>
+<img :src="$withBase('/image/note/tlpi/03_002_系统调用的执行步骤.webp')" alt="系统调用的执行步骤">
+
+### 库函数
+
+* 库函数是比底层调用更为方便的调用接口
+
+### 标准 C 语言函数库: GNU C 语言库 glibc
+
+* 查看动态库依赖及确定 glibc 版本
+
+  ```bash
+  [root@louis tmp]# ldd a.out
+    linux-vdso.so.1 =>  (0x00007ffce43cf000)
+    libc.so.6 => /lib64/libc.so.6 (0x00007fc0257fb000)
+    /lib64/ld-linux-x86-64.so.2 (0x00007fc025bc9000)
+  [root@louis tmp]# /lib64/libc.so.6
+  GNU C Library (GNU libc) stable release version 2.17, by Roland McGrath et al.
+  Copyright (C) 2012 Free Software Foundation, Inc.
+  This is free software; see the source for copying conditions.
+  There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A
+  PARTICULAR PURPOSE.
+  Compiled by GNU CC version 4.8.5 20150623 (Red Hat 4.8.5-39).
+  Compiled on a Linux 3.10.0 system on 2020-03-31.
+  Available extensions:
+    The C stubs add-on version 2.1.2.
+    crypt add-on version 2.1 by Michael Glad and others
+    GNU Libidn by Simon Josefsson
+    Native POSIX Threads Library by Ulrich Drepper et al
+    BIND-8.2.3-T5B
+    RT using linux kernel aio
+  libc ABIs: UNIQUE IFUNC
+  For bug reporting instructions, please see:
+  <http://www.gnu.org/software/libc/bugs.html>.
+  ```
+
+  ```cpp
+  #include <gnu/libc-version.h>
+
+  // 返回指向版本字符串的指针
+  const char *gnu_get_libc_version(void);
+  ```
+
+### 处理来自系统调用和库函数的错误
+
+#### 处理系统调用失败
+
+* 系统调用失败时, 会将全局整形变量 errno 设置为一个正值, 以标识具体的错误.
+  * 程序应包含 `<errno.h>` 头文件, 提供对 errno 的声明, 及一组针对各种错误编号而定义的常量
+  * 这些常量都以 `E` 开头
+* 调用系统调用或库函数成功, errno 也不会被重置为 0. 所以在仅从错误检查时, 必须首先检查函数的
+  返回值是否表明调用出错, 然后再检查 errno 确定错误原因
+* 针对少数调用成功返回 -1 的系统调用, 需要在调用前将 errno 设置为 0, 并在调用后对其进行检查
+* 系统调用失败后, 使用库函数 `perror() strerror()` 根据 errno 打印错误消息
+
+  ```cpp
+  #include <stdio.h>
+
+  void perror(const char *msg);
+  ```
+  ```cpp
+  #include <string.h>
+
+  // 根据 errnum 错误号, 返回相应的错误字符串
+  char *strerror(int errnum);
+  ```
+
+#### 处理来自库函数的错误
+
+* 使用前需要查看手册
+* 某些库函数错误返回值为 -1, 并以 errno 号来表示具体错误
+* 某些库函数在出错时会返回 -1 之外的值, 但仍会设置 errno 来表明具体的出错情况
+* 有些函数不适用 errno
+
+### 可移植性问题
+
+* 特性测试宏, 可显露遵循特定标准的定义
+
+  ```bash
+  #define _BSD_SOURCE 1
+
+  # 或者
+  gcc -D_BSD_SOURCE
+  ```
+
+* 系统数据类型
+  * SUSv3 规范了各种标准系统数据类型, 每种类型的定义均使用 C 语言的 typedef 特性.
+  * 标准系统数据类型大多数以 `_t` 结尾
+  * 大部分声明在 `<sys/types.h>`
+  * 应用程序应采用这些类型定义(而非原生 C 语言类型)来声明其使用的变量, 才能保证可移植性
+* 打印系统数据类型值
+  * 一般的应对策略是强制转换相应值为 long 类型后, 再使用 `%ld` 限定符
+  * `off_t` 大小与 long long 相当, 一般使用 `%lld` 限定符
+
+    ```cpp
+    pid_t mypid = getpid();
+    printf("%ld\n", (long) mypid);
+    ```
+* 初始化操作和使用结构
+  * 结构体内部成员顺序不做规范, 所以初始化时必须对每一个成员进行初始化
+  * C99 新的初始化方法
+
+    ```cpp
+    struct sembuf {
+      unsigned short sem_num;
+      short sem_op;
+      sgort sem_flg;
+    };
+
+    struct sembuf s = { .sem_num = 3, .sem_op = -1, .sem_flg = SEM_UNDO };
+    ```
+
 ## 06 - 进程
 
 ### 进程和程序

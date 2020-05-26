@@ -363,6 +363,89 @@ nonvoluntary_ctxt_switches:     40
     struct sembuf s = { .sem_num = 3, .sem_op = -1, .sem_flg = SEM_UNDO };
     ```
 
+
+## 04 - 文件 I/O: 通用的 I/O 模型
+
+* 文件描述符用以表示所有类型的已打开文件, 包括管道(pipe), FIFO, socket, 终端, 设备和普通文
+  件, 针对每个进程, 文件描述符都自成一套
+  * 头文件 `<unistd.h>`
+
+  **标准文件描述符**<br>
+  <img :src="$withBase('/image/note/tlpi/04_001_标准文件描述符.webp')" alt="标准文件描述符">
+
+* 通用 I/O
+  * 系统调用 `open() read() write() close()` 可以对所有类型的文件执行 I/O 操作
+
+  ```cpp
+  #include <sys/stat.h>
+  #include <fcntl.h>
+
+  // flags 位掩码
+  //    O_RDONLY O_WRONLY O_RDWR 等
+  // mode 当调用 open() 创建新文件时, 位掩码参数 mode 指定了文件的访问权限, open 未指定
+  //      O_CREAT 标志, 则省略 mode 参数
+  // 调用成功返回文件描述符(进程未使用的最小文件描述符)
+  // 调用失败返回 -1, 并将 errno 置为相应的错误标识
+  int open(const char *pathname, int flags, .../* mode_t mode */);
+
+  #include <unistd.h>
+
+  // count 指定最多能读取的字节数
+  // 调用成功返回实际读取的字节数
+  // 遇到 EOF 返回 0
+  // 出现错误返回 -1
+  // size_t 无符号整数类型
+  // ssize_t 有符号整数类型
+  // read() 能够从文件中读取任意序列的字节, 包括文本及二进制数据等, 所以需要手动在 buffer
+  //   尾部添加 '\0', 同时 count == sizeof(buff) - 1
+  ssize_t read(int fd, void *buffer, size_t count);
+
+  // 调用成功返回实际写入的字节数
+  // 对磁盘文件执行 I/O 操作时, write() 调用成功并不能保证数据已经写入磁盘, 内核会缓存磁盘
+  //    I/O 操作
+  ssize_t write(int fd, void *buffer, size_t count);
+
+  // 应该对 close() 系统调用进行错误检查
+  int close(int fd);
+  ```
+
+  **open() 系统调用的 flags 参数值**<br>
+  <img :src="$withBase('/image/note/tlpi/04_002_open()系统调用的flags参数值.webp')" alt="open() 系统调用的 flags 参数值">
+
+* 改变文件偏移量 lseek()
+  * 调整内核中与文件描述符相关的文件偏移量记录, 不引起任何对物理设备的访问
+
+  ```cpp
+  #include <unistd.h>
+
+  // offset 指定一个以字节为单位的数值
+  // whence 执行操作的基点
+  //    SEEK_SET  (offset 必须为非负数)
+  //    SEEK_CUR
+  //    SEEK_END
+  // 调用成功返回新的文件偏移量
+  off_t lseek(int fd, off_t offset, int whence);
+  ```
+
+* 文件空洞
+  * 如果程序的文件偏移量已经越过文件结尾, 然后再执行 I/O 操作, `read()` 返回 0, `write()`
+    可以在文件结尾后的任意位置写入数据.
+  * 从文件结尾到新写入数据间的这段空间被称为文件空洞
+  * 文件空洞不占用任何磁盘空间, 直到后续某个点时, 在文件空洞中写入了数据, 文件系统才会为之分配
+    磁盘块
+  * 文件空洞的优势在于, 与为实际需要的空字节分配磁盘块相比, 系数填充的文件会占用较少的磁盘空间
+
+* 通用 I/O 模型外的操作 ioctl()
+
+  ```cpp
+  #include <sys/ioctl.h>
+
+  // request 指定了将在 fd 上执行的控制操作
+  // argp 一般根据 request 的参数值来确定 argp 期望的类型
+  int ioctl(int fd, int request, ... /* argp */);
+  ```
+
+
 ## 06 - 进程
 
 ### 进程和程序

@@ -2,7 +2,7 @@
 home: true
 heroImage: /image/logo.webp
 actionText: 是, 我知晓! 🔞
-actionLink: /manual/
+actionLink: /about/18+
 features:
 - title: 昨天
   details: 昨夜西风凋碧树, 独上高楼, 望尽天涯路.

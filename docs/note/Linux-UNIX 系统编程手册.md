@@ -363,6 +363,15 @@ nonvoluntary_ctxt_switches:     40
     struct sembuf s = { .sem_num = 3, .sem_op = -1, .sem_flg = SEM_UNDO };
     ```
 
+
+## 04 - 文件 I/O: 通用的 I/O 模型
+
+
+
+
+
+
+
 ## 06 - 进程
 
 ### 进程和程序

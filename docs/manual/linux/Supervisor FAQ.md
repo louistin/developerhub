@@ -12,7 +12,7 @@ vim /etc/supervisor
 ```
 
 ## conf 示例
-```conf
+```bash
 # /etc/supervisord.d/nginx.conf
 
 [program:nginx]

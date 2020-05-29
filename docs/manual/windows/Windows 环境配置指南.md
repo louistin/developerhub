@@ -69,6 +69,10 @@
     HostName 111.229.202.186
     User louis
     IdentityFile C:\Users\Louis\.ssh\id_rsa
+
+  # 上传 windows 端公钥, 在 centos 上执行
+  # known_hosts 中有连接记录的需要删除
+  cat id_rsa.pub >> .ssh/authorized_keys
   ```
 
 ### Git

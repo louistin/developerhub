@@ -54,7 +54,7 @@
 
   ```bash
   # 设置 centos 上 /etc/ssh/sshd_config
-  PermitRootLogin no
+  PermitRootLogin yes
   UsePAM no
   PasswordAuthentication no
 

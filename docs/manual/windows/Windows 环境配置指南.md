@@ -50,6 +50,27 @@
         `Microsoft VS Code\resources\app\extensions\theme-solarized-dark\themes`
         打开 `solarized-dark-color-theme`, 将 `comment` 的 `italic` 删除为空
 
+* 免密登陆远程主机
+
+  ```bash
+  # 设置 centos 上 /etc/ssh/sshd_config
+  PermitRootLogin no
+  UsePAM no
+  PasswordAuthentication no
+
+  systemctl restart sshd.service
+  systemctl status sshd.service
+
+  chmod 700 /home/louis/.ssh
+  chmod 644 /home/louis/.ssh/authorized_keys
+
+  # VSCode 配置
+  Host 111.229.202.186
+    HostName 111.229.202.186
+    User louis
+    IdentityFile C:\Users\Louis\.ssh\id_rsa
+  ```
+
 ### Git
 
 ```bash

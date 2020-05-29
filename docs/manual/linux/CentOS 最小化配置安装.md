@@ -80,31 +80,31 @@ exit                            # 退出当前 bash 环境, 恢复系统默认 b
 
 ### Git
 
-    ```bash
-    # 下载源码
-    https://codeload.github.com/git/git/zip/master
+```bash
+# 下载源码
+https://codeload.github.com/git/git/zip/master
 
-    yum -y install openssl openssl-devel curl curl-devel unzip perl perl-devel \
-                    expat expat-devel zlib zlib-devel asciidoc xmlto \
-                    gettext-devel openssh-clients
+yum -y install openssl openssl-devel curl curl-devel unzip perl perl-devel \
+                expat expat-devel zlib zlib-devel asciidoc xmlto \
+                gettext-devel openssh-clients
 
-    make all && make prefix=/usr/local/git install
+make all && make prefix=/usr/local/git install
 
-    # 添加环境变量 /etc/profile
-    GIT_HOME=/usr/local/git
-    PATH=$GIT_HOME/bin:$GIT_HOME/libexec/git-core:$PATH
+# 添加环境变量 /etc/profile
+GIT_HOME=/usr/local/git
+PATH=$GIT_HOME/bin:$GIT_HOME/libexec/git-core:$PATH
 
-    # 效果同上
-    export $GIT_HOME=/usr/local/git
-    export PATH=$GIT_HOME/bin:$GIT_HOME/libexec/git-core:$PATH
+# 效果同上
+export $GIT_HOME=/usr/local/git
+export PATH=$GIT_HOME/bin:$GIT_HOME/libexec/git-core:$PATH
 
-    source /etc/profile
+source /etc/profile
 
-    # 配置 生成公钥 ~/.ssh/id_rsa.pub
-    git config --global user.name "louis"
-    git config --global user.email "louis.tianlu@gmail.com"
-    ssh-keygen -t rsa -C "louis.tianlu@gmail.com"
-    ```
+# 配置 生成公钥 ~/.ssh/id_rsa.pub
+git config --global user.name "louis"
+git config --global user.email "louis.tianlu@gmail.com"
+ssh-keygen -t rsa -C "louis.tianlu@gmail.com"
+```
 
 ### Vim
 

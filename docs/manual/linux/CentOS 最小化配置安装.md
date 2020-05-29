@@ -63,8 +63,10 @@ yum install epel-release \
     java java-devel \
     maven \
     tcl tcl-devel \
+    ruby-devel \
+    python3-devel
 
-pip install mycli
+pip3 install mycli
 ```
 
 ### GCC
@@ -115,6 +117,10 @@ yum install ncurses ncurses-devel readline readline-devel lua lua-devel
     --enable-pythoninterp --enable-python3interp --enable-luainterp
 
 make && make install
+
+# 将 .vimrc .vimrc.bundles 复制到 ~ 目录, 安装插件管理器, 打开 vim, 执行 PlugInstall
+# 需要确认 +lua +ruby +pythpn3
+curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 ```
 
 ### MySQL
@@ -169,7 +175,7 @@ systemctl restart jenkins
 # Global Tool Configuration 配置 git (安装的高版本) path: /usr/local/git/bin
 # 安装 NodeJS 插件, 配置 node path
 # 安装 workspace cleanup, Build Environment -> Delete workspace before build starts
-# NodeJS 配置最终解决方法是不使用系统node 而是使用插件安装
+# NodeJS 配置最终解决方法是不使用系统node 而是使用插件安装 (也可以不使用插件, 见 FAQ)
 ```
 
 ### NodeJS

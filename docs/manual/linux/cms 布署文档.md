@@ -60,7 +60,7 @@ nginx.exe -s reload
 nginx.ext -s quit
 ```
 
-```conf
+```bash
 # Windows 开发调试 nginx.conf 配置
 # 1080 网页请求 port
 # 2560 Vue 项目 port
@@ -117,7 +117,7 @@ server {
 * Nginx 配置
 * jar 文件运行
 
-```conf
+```bash
 # Linux 正式布署配置
 # Vue build 生成的网页文件放在 html/cms
 server {
@@ -183,7 +183,7 @@ ps -aux | grep java
 kill -9 pid
 ```
 
-```conf
+```bash
 # 使用supervisor 管理 jar
 [program:cms]
 environment=JAVA_HOME=/usr/bin

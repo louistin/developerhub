@@ -409,7 +409,7 @@ systemctl start/stop/restart docker
   }
   ```
 
-  ```conf
+  ```bash
   # nginx.conf
   user root;
   worker_processes 2;

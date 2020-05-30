@@ -53,6 +53,7 @@ yum install epel-release \
     iftop \
     htop \
     python-pip python-devel \
+    python3-devel \
     lrzsz \
     openssl openssl-devel \
     curl curl-devel \
@@ -64,7 +65,8 @@ yum install epel-release \
     maven \
     tcl tcl-devel \
     ruby-devel \
-    python3-devel
+    nmap-ncat \
+
 
 pip3 install mycli
 ```

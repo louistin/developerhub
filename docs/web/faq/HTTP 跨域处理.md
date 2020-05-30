@@ -13,7 +13,7 @@
 * Jsonp 方法只对 `GET` 请求有效
 * JavaScript 使用 `axios.post` 执行 `POST` 请求
 * Nginx 配置
-    ```bashig
+    ```bash
     location /baiduapi/ {
       rewrite  ^.+baiduapi/?(.*)$ /$1 break;
       proxy_pass https://aip.baidubce.com/;

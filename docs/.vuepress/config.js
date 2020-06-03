@@ -19,7 +19,7 @@ module.exports = {
             { text: '前端开发', link: '/web/' },
             { text: '开源软件', link: '/opensource/' },
             { text: '读书笔记', link: '/note/' },
-            { text: '开发手册',  link: '/manual/' },
+            { text: '开发手册', link: '/manual/' },
             { text: '关于', link: '/about/' }
         ],
         sidebar: {
@@ -172,6 +172,7 @@ module.exports = {
                     collapsable: true,
                     children: [
                         "/manual/linux/CentOS 最小化配置安装",
+                        "/manual/linux/Fedora Workstation 安装指南",
                         "/manual/linux/RHEL 8 前端开发环境搭建指南",
                         "/manual/linux/CentOS dokuwiki 安装指南",
                         "/manual/linux/网站自动化布署",
@@ -224,7 +225,7 @@ module.exports = {
         'vuepress-plugin-reading-progress',
         '@vuepress/back-to-top',
         'vuepress-plugin-code-copy',
-        [ '@vuepress/last-updated', {
+        ['@vuepress/last-updated', {
             transformer: (timestamp, lang) => {
                 const date = new Date(timestamp);
                 const dateNumFun = (num) => num < 10 ? `0${num}` : num;
@@ -242,7 +243,7 @@ module.exports = {
         }],
         //'vuepress-plugin-seo',
         // 页面滚动时自动激活侧边栏
-        [ '@vuepress/active-header-links', {
+        ['@vuepress/active-header-links', {
             sidebarLinkSelector: '.sidebar-link',
             headerAnchorSelector: '.header-anchor'
         }],

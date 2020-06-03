@@ -1,5 +1,7 @@
 # Fedora Workstation 安装指南
-> 鉴于在笔记本上安装的 CentOS 视觉上实在是感觉不舒服, 决定将笔记本系统更换为同源的 Fedora
+---
+> <p align="left" style="font-family:Arial;font-size:80%;color:#C0C0C0">全文字数 {{ $page.readingTime.words}} words &nbsp;|&nbsp; 阅读时间 {{Math.ceil($page.readingTime.minutes)}} mins</p><br>
+> 鉴于笔记本上安装的 CentOS 视觉上实在是感觉不舒服, 决定将笔记本系统更换为同源的 Fedora
 
 [[TOC]]
 

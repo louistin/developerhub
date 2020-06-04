@@ -28,7 +28,7 @@
 git clone git://github.com/seebi/dircolors-solarized.git
 cp ~/dircolors-solarized/dircolors.256dark ~/.dircolors
 eval 'dircolors .dircolors'
-# 在 .bashrc 中天加
+# 在 .bashrc 中添加
   export TERM=xterm-256color
 
 git clone git://github.com/sigurdga/gnome-terminal-colors-solarized.git

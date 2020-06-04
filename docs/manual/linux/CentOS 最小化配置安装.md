@@ -315,6 +315,6 @@ command=/opt/openresty/%(program_name)s/sbin/nginx -g 'daemon off;' -c /opt/open
 ```bash
 # man 手册添加 STL
 # 下载 libstdc++-***-man.tar.bz2 http://www.mirrorservice.org/sites/sourceware.org/pub/gcc/libstdc%2B%2B/doxygen/
-# 解压后复制 man3 目录下得文件到 /usr/share/man/man3
+# 解压后复制 man3 目录下的文件到 /usr/share/man/man3
 man std::vector
 ```

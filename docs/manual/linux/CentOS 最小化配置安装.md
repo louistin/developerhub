@@ -67,7 +67,6 @@ yum install epel-release \
     ruby-devel \
     nmap-ncat \
 
-
 pip3 install mycli
 ```
 
@@ -317,4 +316,13 @@ command=/opt/openresty/%(program_name)s/sbin/nginx -g 'daemon off;' -c /opt/open
 # 下载 libstdc++-***-man.tar.bz2 http://www.mirrorservice.org/sites/sourceware.org/pub/gcc/libstdc%2B%2B/doxygen/
 # 解压后复制 man3 目录下的文件到 /usr/share/man/man3
 man std::vector
+```
+
+### nc
+
+```bash
+# 监听本地端口
+nc -l -v -p LOCAL_PORT
+# 连接远程主机
+nc -nvv REMOTE_IP REMOTE_PORT
 ```

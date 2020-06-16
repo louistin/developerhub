@@ -1124,6 +1124,141 @@ FILE *fdopen(int fd, const char *mode);
   多次, 在解除阻塞后也只会传递一次
 
 
+## 24 - 进程的创建
+
+### fork() exit() wait() execve()
+
+
+## 29 - 线程
+
+### 概述
+
+* 一个进程可以包含多个线程, 传统意义上的 UNIX 进程是只包含一个线程的多线程程序特例
+* 同一进程中的所有线程均会独立执行相同的程序, 且共享同一份全局内存域, 其中包括初始化数据段, 未
+    初始化数据段, 堆内存段
+* 同一进程中的多个线程可以并发, 多核处理器中多线程可以并行
+
+  **同时执行4个线程的进程**<br>
+  <img :src="$withBase('/image/note/tlpi/29_001_同时执行4个线程的进程.webp')" alt="同时执行4个线程的进程">
+
+* 线程间共享内容
+  * 进程 ID
+  * 进程组 ID 与 会话 ID
+  * 打开的文件描述符
+  ...
+* 各线程独有
+  * 线程 ID
+  * 信号掩码
+  * 线程特有数据
+  * errno 变量
+  * 栈, 本地变量和函数的调用链接信息
+  ...
+
+### Pthreads API 的详细背景
+
+* Pthreads 数据类型
+
+  ```cpp
+  pthread_t
+  pthread_cond_t
+  pthread_mutex_t
+  pthread_key_t
+  pthread_once_t
+  pthread_attr_t
+  ```
+
+* 线程和 errno
+  * 多线程程序中, 每个线程都有属于自己的 errno
+* Pthreads 函数返回值
+  * 所有 Pthreads 函数均以返回值 0 表示成功, 返回一正值表示失败, 此时的返回值与传统 UNIX
+    调用置于 errno 的值含义相同
+* 编译 Pthreads 程序
+  * `gcc -pthread`
+
+### 线程 API
+
+* 创建线程
+  * pthread 创建后无法确定系统如何调度线程使用 CPU 资源
+
+  ```cpp
+  // thread
+  // attr 指定新线程的各种属性, 一般为 NULL
+  int pthread_create(pthread_t *thread, const phread_attr_t *attr, void*(*start)(void *), void *arg);
+  ```
+
+* 终止线程
+  * 线程 `start()` 函数执行 return 语句并返回指定值
+  * 线程调用 `pthread_exit()`
+  * 调用 `pthread_cancel()` 取消线程
+  * 任意线程调用 `exit()` 或主线程执行了 return 语句
+* 主线程调用 `pthread_exit()` 而非 `exit()` 或 return 语句, 其他线程将继续运行
+
+  ```cpp
+  // retval 指定线程返回值, 另一线程通过调用 pthread_join() 获取
+  // retval 值不要分配于线程栈中, 线程终止后, 可能无效
+  void pthread_exit(void *retval);
+  ```
+
+
+* 示例
+
+  ```cpp
+  #include <pthread.h>
+  #include <stdio.h>
+  #include <stdlib.h>
+  #include <string.h>
+  #include <unistd.h>
+
+  char *ret = NULL;
+
+  void *pthread_sub(void *arg) {
+    printf("I am sub thread: %ld.\n", (long)pthread_self());
+
+    sleep(1);
+
+    printf("sub thread over.\n");
+
+    ret = (char *)malloc(32);
+    memset(ret, 0, sizeof(ret));
+    sprintf(ret, "%s", "sub thread");
+
+    pthread_exit(ret);
+
+  #if 0
+    exit(0);
+  #endif
+
+    return ret;
+  }
+
+  int main(int argc, char *argv[]) {
+    pthread_t tid;
+
+    pthread_create(&tid, NULL, pthread_sub, NULL);
+
+    printf("I am main thread.\n");
+
+    char *retval = NULL;
+  #if 0
+    pthread_exit(NULL);
+  #elif 1
+    pthread_join(tid, (void **)&retval);
+  #elif 0
+    pthread_detach(tid);
+  #elif 0
+    sleep(5);
+  #elif 0
+    pthread_join(pthread_self(), NULL);
+  #endif
+
+    printf("main thread over, retval: %s.\n", retval);
+
+    return 0;
+  }
+  ```
+
+
+
 ## 63 - 其他备选的 I/O 模型
 
 ### 整体概览

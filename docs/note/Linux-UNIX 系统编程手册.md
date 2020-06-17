@@ -1147,7 +1147,7 @@ FILE *fdopen(int fd, const char *mode);
   * 打开的文件描述符
   ...
 * 各线程独有
-  * 线程 ID
+  * 线程 ID (`pthread_self()` 与 `gettid()` 的值并不相同, 前者来自线程库, 后者来自内核)
   * 信号掩码
   * 线程特有数据
   * errno 变量
@@ -1190,8 +1190,9 @@ FILE *fdopen(int fd, const char *mode);
   * 线程 `start()` 函数执行 return 语句并返回指定值
   * 线程调用 `pthread_exit()`
   * 调用 `pthread_cancel()` 取消线程
-  * 任意线程调用 `exit()` 或主线程执行了 return 语句
+  * 任意线程调用 `exit()` (此时所有线程都将立即终止) 或主线程执行了 return 语句
 * 主线程调用 `pthread_exit()` 而非 `exit()` 或 return 语句, 其他线程将继续运行
+  * 线程可以调用 `pthread_exit()` 独立退出
 
   ```cpp
   // retval 指定线程返回值, 另一线程通过调用 pthread_join() 获取
@@ -1257,6 +1258,74 @@ FILE *fdopen(int fd, const char *mode);
   }
   ```
 
+### 线程 ID
+
+* Linux 中线程 ID 在所有进程中是唯一的
+* `pthread_create()` 向调用者返回线程 ID
+* 线程获取自身线程 ID
+
+  ```cpp
+  pthread_t pthread_self(void);
+
+  // pthread_t 应视作是不透明的, Linux 中实现为 unsigned long
+  int pthread_equal(pthread_t t1, pthread_t t2);
+  ```
+
+### 连接 (joining) 已终止的线程
+
+* `pthread_join()` 等待线程 thread 的终止, 如果已终止, 则立即返回
+* 传入一个已连接的 thread 将会导致无法预知的行为
+* 如果线程未分离 (detached), 则必须使用 `pthread_join()` 来进行连接, 否则会导致僵尸线程
+* 线程间关系对等, 进程中的任意线程都可以调用 `pthread_join()` 与该进程的任意其他线程连接
+
+  ```cpp
+  // retval 保存线程终止时的返回值的拷贝, pthread_exit() 或 return 返回值
+  int pthread_join(pthread_t thread, void **retval);
+  ```
+
+### 线程的分离
+
+* 当不关心线程的返回状态, 只希望系统在线程终止时自动清理移除的, 可以调用 `pthread_detach()`
+  并向 thread 参数传入指定线程的标识符, 将该线程标记为处于分离状态
+* 一旦线程处于 detached 状态, 就不能再使用 `pthread_join()` 获取状态, 也不能再恢复可连接
+  状态
+* 其他线程调用 `exit()` 或主线程执行 return, 处于 detached 状态的线程也还是会受到影响, 会
+  立刻终止
+
+  ```cpp
+  // 只控制线程终止之后发生的事情, 而非何时或如何终止
+  int pthread_detach(pthread_t thread);
+  ```
+
+### 线程属性
+
+* 使用分离属性创建线程
+
+  ```cpp
+  pthread_t thr;
+  pthread_attr_t attr;
+  int s;
+
+  s = pthread_arrt_init(&attr);
+  s = pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+  s = pthread_create(&thr, &attr, thread_func, NULL);
+  S = pthread_attr_destroy(&attr);
+
+  ```
+
+### 线程 VS 进程
+
+* 线程优点
+  * 线程间共享数据简单
+  * 创建线程速度快
+* 线程缺点
+  * 多线程编程时, 需要确保调用线程安全(thread-safe) 的函数, 或者以线程安全的方式来调用函数
+  * 某个线程中的 bug 可能会危及该进程的所有线程, 因为他们共享着相同的地址空间和其他属性
+  * 每个线程都在争用输注进程中有限的虚拟地址空间
+* 其他
+  * 多线程应用中应避免使用信号
+  * 所有线程必须运行同一个程序(可能是位于不同函数中)
+  * 除数据外, 线程还可以共享某些其他信息(文件描述符等)
 
 
 ## 63 - 其他备选的 I/O 模型

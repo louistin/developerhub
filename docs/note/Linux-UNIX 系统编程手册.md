@@ -1328,6 +1328,133 @@ FILE *fdopen(int fd, const char *mode);
   * 除数据外, 线程还可以共享某些其他信息(文件描述符等)
 
 
+## 30 - 线程: 线程同步
+
+多线程应用必须使用互斥量和条件变量等同步原语来协调对共享变量的访问. 互斥量提供了对共享变量的独
+占式访问. 条件变量允许一个或多个线程等候通知: 其他线程改变了共享变量的状态.
+
+### 互斥量 mutex: 保护对共享变量的访问
+
+  * 临界区
+    * 访问某一共享资源的代码片段, 并且这段代码的执行应为原子操作
+  * 加锁和解锁互斥量
+    * 其他线程已锁定该互斥量, 则另一线程所定时会阻塞直到该互斥量被解锁
+    * 死锁问题
+      * 同一线程重复锁定互斥量
+    * 错误用法
+      * 解锁未锁定互斥量
+      * 解锁由其他线程锁定的互斥量
+  * 其他变体
+    * `pthread_mutex_trylock()`
+    * `pthread_mutex_timedlock()`
+  * 避免死锁问题
+    * 方案一, 定义互斥量的层级关系 (设计好层级关系)
+    * 方案二, 在锁定第一个互斥量后, 使用 `pthread_mutex_trylock()` 尝试锁定其他互斥量,
+      失败就全部解锁, 再重试. (效率低, 但灵活)
+  * 动态初始化场景
+    * 动态分配于堆中的互斥量
+    * 互斥量是在栈中分配的自动变量
+    * 初始化经由静态分配, 且不使用默认属性的互斥量
+  * 自动或动态分配的互斥量销毁
+    * 只有当互斥量处于未锁定状态, 且后续也无任何线程企图锁定它时
+    * 动态内存 free 前应将其互斥量 destroy
+    * destroy 后的互斥量可以调用 init 重新初始化
+
+  ```cpp
+  #include <pthread.h>
+
+  // 静态分配的互斥量, 无需 destroy
+  pthread_mutex_t mtx = PTHREAD_MUTEX_INITIALIZER;
+
+  int pthread_mutex_lock(pthread_mutex_t *mutex);
+  int pthread_mutex_unlock(pthread_mutex_t *mutex);
+
+  // 动态初始化互斥量
+  int pthread_mutex_init(pthread_t *mutex, const pthread_mutexattr_t *attr);
+  int pthread_mutex_destroy(pthread_mutex_t *mutex);
+  ```
+
+### 条件变量 condition variable: 通知状态的改变
+
+* 条件变量允许一个线程就某个共享变量的状态变化通知其他线程, 并让其他线程等待(阻塞于)这一通知.
+* 条件变量并不保存状态信息, 只是传递应用程序状态的一种通讯机制
+* `pthread_cond_wait()` 执行步骤
+  * 解锁互斥量 mutex
+  * 阻塞线程调用, 直至另一线程就条件变量发出信号
+  * 重新锁定 mutex
+* 动态初始化场景
+    * 自动或动态分配的条件变量
+    * 未采用默认属性经由静态分配的条件变量
+* 自动或动态分配的条件变量销毁
+    * 没有任何线程在等待它时
+    * 动态内存 free 前应将其条件变量 destroy
+    * destroy 后的条件变量可以调用 init 重新初始化
+
+  ```cpp
+  #include <pthread.h>
+
+  // 静态分配的条件变量
+  pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
+
+  // 至少唤醒任意一个等待线程 (适用所有线程执行完全相同的任务)
+  int pthread_cond_signal(pthread_cond_t *conf);
+  // 唤醒所有阻塞的线程 (适用所有线程执行的任务不同)
+  int pthread_cond_broadcast(pthread_cond_t *conf);
+  int pthread_cond_wait(pthread_cond_t *conf, pthread_mutex_t *mutex);
+  // abstime 指定时间到期且无相关条件变量的通知, 返回 ETIMEOUT 错误
+  int pthread_cond_wait(pthread_cond_t *conf, pthread_mutex_t *mutex, const struct timespec *abstime);
+
+  int pthread_cond_init(pthread_cont_t *cond, pthread_condattr_t *attr);
+  int pthread_cond_destroy(pthread_cond_t *cond);
+  ```
+
+  ```cpp
+  int msgsvr_queue_read(void *handler, msgsvr_message_t *message) {
+    msgsvr_queue_t *queue = (msgsvr_queue_t *)handler;
+    msgsvr_message_t *__message = NULL;
+
+    pthread_mutex_lock(&queue->mutex);
+    // 使用 while 而非 if
+    // 不能对判断条件的状态进行假设
+    while (queue->queue->empty()) {
+      pthread_cond_wait(&queue->c_cond, &queue->mutex);
+    }
+
+    __message = (msgsvr_message_t *)queue->queue->front();
+    queue->queue->pop();
+
+    pthread_mutex_unlock(&queue->mutex);
+    pthread_cond_signal(&queue->p_cond);
+
+    if (!__message) {
+      return ERROR;
+    }
+
+    memcpy(message, __message, sizeof(msgsvr_message_t));
+    free(__message);
+    __message = NULL;
+
+    return OK;
+  }
+
+  int msgsvr_queue_write(void *handler, msgsvr_message_t *message) {
+    msgsvr_queue_t *queue = (msgsvr_queue_t *)handler;
+
+    pthread_mutex_lock(&queue->mutex);
+    while (queue->queue->size() >= queue->size) {
+      pthread_cond_wait(&queue->p_cond, &queue->mutex);
+    }
+
+    queue->queue->push(message);
+
+    pthread_mutex_unlock(&queue->mutex);
+    pthread_cond_signal(&queue->c_cond);
+
+    return OK;
+  }
+  ```
+
+
 ## 63 - 其他备选的 I/O 模型
 
 ### 整体概览

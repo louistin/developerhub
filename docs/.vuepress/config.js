@@ -180,6 +180,7 @@ module.exports = {
                         "/manual/linux/Nginx 配置手册",
                         "/manual/linux/SpringBoot + Vue FAQ",
                         "/manual/linux/Supervisor FAQ",
+                        "/manual/linux/Linux 服务器安全管理指南"
                     ]
                 },
                 {

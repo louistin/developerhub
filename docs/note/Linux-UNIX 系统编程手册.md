@@ -1383,12 +1383,19 @@ FILE *fdopen(int fd, const char *mode);
   * 阻塞线程调用, 直至另一线程就条件变量发出信号
   * 重新锁定 mutex
 * 动态初始化场景
-    * 自动或动态分配的条件变量
-    * 未采用默认属性经由静态分配的条件变量
+  * 自动或动态分配的条件变量
+  * 未采用默认属性经由静态分配的条件变量
 * 自动或动态分配的条件变量销毁
-    * 没有任何线程在等待它时
-    * 动态内存 free 前应将其条件变量 destroy
-    * destroy 后的条件变量可以调用 init 重新初始化
+  * 没有任何线程在等待它时
+  * 动态内存 free 前应将其条件变量 destroy
+  * destroy 后的条件变量可以调用 init 重新初始化
+* 测试条件变量的判断的条件
+  * 必须使用 while 而不是 if 来控制对 `pthread_connd_wait()` 的调用. 因为当代码从阻塞返
+    回时, 并不能确定判断条件的状态, 所以应该立即重新检查判断条件, 在条件不满足的情况下继续休眠.
+    * 其他线程可能会率先获取互斥量并改变相关共享变量的状态
+    * 设计时设置 "宽松的" 判断条件获取更简单, 使用条件变量表示可能性而非确定性
+    * 可能会发生虚假唤醒情况. 在一些实现中, 即使没有任何其他线程真的就条件变量发出信号, 等待条
+      件变量的线程仍有可能醒来
 
   ```cpp
   #include <pthread.h>
@@ -1452,6 +1459,130 @@ FILE *fdopen(int fd, const char *mode);
 
     return OK;
   }
+  ```
+
+
+## 31 - 线程: 线程安全和每线程存储
+
+### 线程安全 (再论可重入性)
+
+* 若一个函数可由多个线程同时安全调用, 则称之为线程安全的函数. 使用全局或静态变量是导致函数非线程
+  安全的通常原因.
+* 多线程应用中, 保障非线程安全函数安全的方法
+  * 运用互斥锁来防护对该函数的所有调用.
+    * 可能带来性能的下降
+  * 仅在函数中操作共享变量(临界区)的代码前后加入互斥锁
+* 如能避免使用全局或静态变量, 可重入函数无需使用互斥量即可实现线程安全
+
+
+## 32 - 线程: 线程取消
+
+###
+
+
+## 33 - 线程: 更多细节
+
+### 线程栈
+
+* 创建线程时, 每个线程都有一个属于自己的固定大小的线程栈. 主线程栈的空间大, 其他所有线程缺省大
+  小 (2M 32位, 32M 64位)
+  * `ulimit -s` 查看默认线程栈大小
+* 操作线程栈大小函数
+  * `pthread_attr_setstacksize()`
+  * `pthread_attr_setstack()`
+
+### 线程和信号
+
+* 不要将线程和信号混合使用, 只要可能多线程应用程序的设计应该避免使用信号
+* 如果多线程应用必须处理异步信号的话, 最简洁的做法是所有的线程都阻塞信号, 创建一个专门的线程调
+  用 `sigwait()` 函数来接收收到的信号, 这个线程可以安全的执行共享内存修改和调用非异步信号安全
+  的函数
+
+### 线程和进程控制
+
+* 线程和 `exec()`
+  * 只要由任一线程调用了 `exec()` 系列函数之一, 调用程序将被完全替换, 除了调用线程外, 其他线
+    程将会立即消失
+* 线程和 `fork()`
+  * 当多线程进程调用 `fork()` 时, 仅会将发起调用的线程复制到子进程中, 其他线程均会在子进程中
+    立刻消失
+    * 此时子进程中会保留全局变量及 Pthreads 对象等
+    * 有可能导致子进程内存泄漏
+  * 只有当其后紧跟 `exec()` 调用时, 因为新程序会覆盖原内存, 才推荐在多线程程序中调用 `fork()`
+* 线程与 `exit()`
+  * 任何线程调用了 `exit()`, 或主线程执行 return, 所有线程都将会消失
+
+
+## 41 - 共享库基础
+
+### 静态库
+
+```bash
+# 创建静态库
+# -g 包含调试信息
+gcc -g -c mod1.c mod2.c mod3.c
+ar r libdemo.a mod1.o mod2.o mod3.o
+rm mod1.o mod2.o mod3.o
+
+# 显示目录表
+ar tv libevent.a
+rw-rw-r-- 1000/1000  70088 May 25 09:52 2020 event.o
+rw-rw-r-- 1000/1000  31504 May 25 09:52 2020 buffer.o
+rw-rw-r-- 1000/1000  32464 May 25 09:52 2020 evbuffer.o
+
+# 删除模块
+ar d libdemo.a mod3.o
+
+# 使用静态库
+# 可执行文件会包含所有被链接进程序的目标文件的副本
+# 链接器只会包含程序需要的模块
+# 链接实际上是由一个单独的链接器程序 ld 来完成的, 调用 gcc 时, 编译器会在后台调用 ld
+gcc -g -o prog prog.o libdemo.a
+# 将静态库放在链接器搜索的其中一个标准目录中 (如 /usr/lib)
+gcc -g -o prog prog.o -ldemo
+# 指定链接器搜索的额外目录
+gcc -g -o prog prog.o -LLIBDIR -ldemO
+```
+
+### 共享库
+
+* 当地一个需要共享库中的模块的程序启动时, 库的单个副本就会在运行时被加载进内存. 当后面使用同一共
+  享库的其他程序启动时, 他们也会使用已经被加载进内存的库的副本.
+  * 共享库的代码是由多个进程共享, 但其中变量不是, 每个使用库的进程会拥有自己在库中定义的全局和
+    静态变量的副本
+* 共享库的创建和使用
+
+  ```bash
+  [louis@louis shared_lib]$ ls
+  mod1.c  mod1.h  mod2.c  mod2.h  prog.c
+  [louis@louis shared_lib]$ gcc -c -fPIC -Wall mod1.c mod2.c
+  [louis@louis shared_lib]$ ls
+  mod1.c  mod1.h  mod1.o  mod2.c  mod2.h  mod2.o  prog.c
+  [louis@louis shared_lib]$ gcc -g -shared -Wl,-soname,libdemo.so.1 -o libdemo.so.1.0.1 mod1.o mod2.o
+  [louis@louis shared_lib]$ ls
+  libdemo.so.1.0.1  mod1.c  mod1.h  mod1.o  mod2.c  mod2.h  mod2.o  prog.c
+  [louis@louis shared_lib]$ ln -s libdemo.so.1.0.1 libdemo.so.1
+  [louis@louis shared_lib]$ ln -s libdemo.so.1.0.1 libdemo.so
+  [louis@louis shared_lib]$ ll
+  total 36
+  lrwxrwxrwx 1 louis louis   16 Jun 25 12:20 libdemo.so -> libdemo.so.1.0.1
+  lrwxrwxrwx 1 louis louis   16 Jun 25 12:20 libdemo.so.1 -> libdemo.so.1.0.1
+  -rwxrwxr-x 1 louis louis 8104 Jun 25 12:20 libdemo.so.1.0.1
+  -rw-rw-r-- 1 louis louis   89 Jun 25 12:17 mod1.c
+  -rw-rw-r-- 1 louis louis   67 Jun 25 12:16 mod1.h
+  -rw-rw-r-- 1 louis louis 1544 Jun 25 12:19 mod1.o
+  -rw-rw-r-- 1 louis louis   89 Jun 25 12:18 mod2.c
+  -rw-rw-r-- 1 louis louis   67 Jun 25 12:17 mod2.h
+  -rw-rw-r-- 1 louis louis 1544 Jun 25 12:19 mod2.o
+  -rw-rw-r-- 1 louis louis  125 Jun 25 12:18 prog.c
+  [louis@louis shared_lib]$ gcc -g -Wall -o prog prog.c -L. -ldemo
+  [louis@louis shared_lib]$ LD_LIBRARY_PATH=. ./prog
+  called mod1
+  called mod2
+  [louis@louis shared_lib]$ ldd libdemo.so
+    linux-vdso.so.1 =>  (0x00007ffc939eb000)
+    libc.so.6 => /lib64/libc.so.6 (0x00007f9075bc1000)
+    /lib64/ld-linux-x86-64.so.2 (0x00007f9076191000)
   ```
 
 

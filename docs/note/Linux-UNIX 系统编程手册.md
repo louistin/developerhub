@@ -1597,7 +1597,7 @@ gcc -g -o prog prog.o -LLIBDIR -ldemO
   * 特定场景下作为一种同步技术, 甚至还可以作为一种通信技术
 
   **UNIX IPC 工具分类**<br>
-  <img :src="$withBase('/image/note/tlpi/43_UNIX_IPC工具分类.webp')" alt="UNIX IPC 工具分类">
+  <img :src="$withBase('/image/note/tlpi/43_001_UNIX_IPC工具分类.webp')" alt="UNIX IPC 工具分类">
 
 ### 通信工具
 
@@ -1679,9 +1679,140 @@ gcc -g -o prog prog.o -LLIBDIR -ldemO
 
 
 ## 44 - 管道和 FIFO
+> 管道: 可以用来在相关进程之间传递数据<br>
+> FIFO: 管道概念的一个变体, FIFO 可以用于任意进程之间的通信
 
+### 管道
 
+* 一个管道是一个字节流, 在使用管道时不存在消息或消息边界的概念. 从管道中可以读取任意大小的数据块,
+  也无法使用 `lseek()` 操作
+* 管道中数据传递是单向的
+* 管道可以确保写入不超过 `PIPE_BUF` 字节的操作是原子的. 当超过时, 内核会将其分割传输, 读端从
+  管道中消耗数据时载附上后续数据. `write()` 调用会阻塞直到所有数据被写入管道为止.
+  * 如果此类阻塞的 `write()` 被一个信号处理器中断了, 则调用将会被解除阻塞并返回成功传入到管道
+    中的字节数(部分写入)
+* 管道的容量是有限的. 一般无需关系, 为防止写入端阻塞, 读端应尽快读取
 
+* 管道的创建和使用
+  * `fork()` 后子进程会继承父进程的文件描述符副本, 即父子进程都可以操作管道
+    * 一般父子进程其一需要立即关闭管道写入端描述符, 另一端立即关闭管道读取端描述符
+    * 如需双向通信则最好创建两个管道
+
+  ```cpp
+  #include <unist.h>
+
+  // 使用 read() write() 执行管道 I/O 操作.
+  // read() 在管道为空时阻塞, write() 在管道满时阻塞
+  int pipe(int filedes[2]);
+  ```
+
+* 管道允许相关进程间的通信
+  * 只要在创建子进程的系列 `fork()` 调用之前通过一个共同的祖先进程创建管道, 则可以用于任意两
+    个或多个相关进程间的通信
+  * 通过 UNIX domain socket 传递一个文件描述符将会使得管道可以为非相关进程通信成为可能
+
+* 关闭未使用管道文件描述符
+  * 确保进程不会耗尽其文件描述符限制
+  * 从管道读取数据的进程会关闭其持有的管道的写入描述符, 这样当其他的进程完成输出并关闭写入描述符
+    后, 读端可以看到文件结束(读完管道数据后 `read()` 将会阻塞)
+  * 当一个进程试图向管道中写入数据, 但是没有任何进程拥有该管道的打开着的读端描述时, 内核会向写
+    入进程发送一个 SIGPIPE 信号, `write()` 返回 EPIPE 错误
+
+* 将管道作为一种进程同步的方法
+  * 如父进程在管道上的 `read()` 在所有子进程关闭了管道的写入端文件描述符后, 结束并返回文件结
+    束 0
+  * 管道可以协调一个进程的动作使之与多个其他相关进程匹配
+  * 管道扩展技术
+    * 子进程向管道写入包含其进程 ID 和一些状态信息的消息
+    * 每个子进程向管道写入一个字节, 父进程计数并分析这些消息
+
+* 使用管道连接过滤器(从 stdin 读取和写入到 stdout)
+  * 管道创建后, 为管道两端分配的文件描述符时可用文件描述符中数值最小的两个
+
+  ```cpp
+  int pfd[2];
+  pipe(pfd);
+
+  // int dup(int oldfd);
+  // 复制参数 oldfd 所指的文件描述符, 成功时返回最小的可用文件描述符
+  // 在这里即将进程的标准输出 1 绑定到管道的写入端, 即 1 与 oldfd 指向同一个文件, 共享同一个
+  // 数据结构
+  close(STDOUT_FILENO);
+  dup(pfd[1]);
+
+  // int dup2(int oldfd, int newfd);
+  // 若 newfd 已经被使用, 则会将其先关闭. 二者相同则不做修改, 返回 newfd
+  // 显式的指定被绑定到管道一端的描述符
+  // 防御性编程实践, 先检查
+  if(pfd[1] != STDOUT_FILENO) {
+    dup2(pfd[1], STDOUT_FILENO);
+    close(pfd[1]);
+  }
+  ```
+
+* 通过管道与 shell 命令进行通信: `popen()`
+
+  ```cpp
+  #include <stdio.h>
+
+  // 创建一个管道, 然后创建一个子进程来执行 shell, shell 又创建一个子进程来执行 command
+  // mode 为 "r" 或 "w", 确定调用进程是从管道中读取数据还是写入数据到管道中
+  // 成功返回文件流指针, 从中读取或写入数据
+  FILE *popen(const char *command, const char *mode);
+  // 关闭管道并等待子进程中的 shell 终止
+  int pclose(FILE *stream);
+  ```
+
+* 管道和 stdio 缓冲
+  * 当 mode 为 w 时, 如果需要确保子进程能够立即从管道中接收数据, 需要定期调用 `fflush()`
+    或使用 `setbuf(fp, NULL)` 调用禁止 stdio 缓冲
+  * 当 mode 为 r 时, 只能依靠子进程的设置了
+  * 使用伪终端替换管道可实现逐行输出缓冲器中的数据
+
+### FIFO 命名管道
+
+* 打开后拥有名称, 可以执行 `read()` `write()` `close()` 等操作
+* 可用于非相关进程间的通信
+* 使用 FIFO 时需要在两端分别设置一个读取进程和一个写入进程
+  * 使用 O_RDWR 的结果是未知
+  * 可以使用 O_NONBLOCK 标记来实现避免在 FIFO 打开时发生阻塞的需求
+* FIFO 非阻塞 I/O
+  * 打开 FIFO 时使用 O_NONBLOCK
+    * 允许单个进程打开一个 FIFO 的两端
+    * 防止打开两个 FIFO 的进程之间产生死锁
+  * 非阻塞 `read()` `write()`
+    * 使用 `fcntl()` 启用或禁用 O_NONBLOCK
+
+  ```cpp
+  #include <sys/stst.h>
+
+  int mkfifo(const char *pathname, mode_t mode);
+
+  int fd = open("fifopath", O_RDONLY | O_NONBLOCK);
+  if (fd == -1) {
+    perror("open");
+  }
+
+  int flags;
+  // 启用
+  flags = fcntl(fd, F_GETFL);
+  flags |= O_NONBLOCK;
+  fcntl(fd, F_SETFL, flags);
+
+  // 禁用
+  flags = fcntl(fd, F_GETFL);
+  flags &= ~O_NONBLOCK;
+  fcntl(fd, F_SETFL, flags);
+  ```
+
+  **FIFO 上调用 open() 的语义**<br>
+  <img :src="$withBase('/image/note/tlpi/44_001_FIFO上调用open()的语义.webp')" alt="FIFO 上调用 open() 的语义">
+
+  **从一个包含 p 字节的管道或 FIFO 中读取 n 字节的语义**<br>
+  <img :src="$withBase('/image/note/tlpi/44_002_从一个包含p字节的管道或FIFO中读取n字节的语义.webp')" alt="从一个包含 p 字节的管道或 FIFO 中读取 n 字节的语义">
+
+  **向一个管道或 FIFO 写入 n 字节的语义**<br>
+  <img :src="$withBase('/image/note/tlpi/44_003_向一个管道或FIFO写入n字节的语义.webp')" alt="向一个管道或 FIFO 写入 n 字节的语义">
 
 
 ## 63 - 其他备选的 I/O 模型

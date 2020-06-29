@@ -1597,7 +1597,7 @@ gcc -g -o prog prog.o -LLIBDIR -ldemO
   * 特定场景下作为一种同步技术, 甚至还可以作为一种通信技术
 
   **UNIX IPC 工具分类**<br>
-  <img :src="$withBase('/image/note/tlpi/43_UNIX IPC 工具分类.webp')" alt="UNIX IPC 工具分类">
+  <img :src="$withBase('/image/note/tlpi/43_UNIX_IPC工具分类.webp')" alt="UNIX IPC 工具分类">
 
 ### 通信工具
 
@@ -1672,10 +1672,17 @@ gcc -g -o prog prog.o -LLIBDIR -ldemO
     * 基于内存映射文件的共享内存
 
   **各种 IPC 工具的标识符和句柄**<br>
-  <img :src="$withBase('/image/note/tlpi/43_002_各种 IPC 工具的标识符和句柄.webp')" alt="各种 IPC 工具的标识符和句柄">
+  <img :src="$withBase('/image/note/tlpi/43_002_各种IPC工具的标识符和句柄.webp')" alt="各种 IPC 工具的标识符和句柄">
 
   **各种 IPC 工具的可访问性和持久性**<br>
-  <img :src="$withBase('/image/note/tlpi/43_003_各种 IPC 工具的可访问性和持久性.webp')" alt="各种 IPC 工具的可访问性和持久性">
+  <img :src="$withBase('/image/note/tlpi/43_003_各种IPC工具的可访问性和持久性.webp')" alt="各种 IPC 工具的可访问性和持久性">
+
+
+## 44 - 管道和 FIFO
+
+
+
+
 
 ## 63 - 其他备选的 I/O 模型
 

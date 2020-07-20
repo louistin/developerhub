@@ -1815,6 +1815,12 @@ gcc -g -o prog prog.o -LLIBDIR -ldemO
   <img :src="$withBase('/image/note/tlpi/44_003_向一个管道或FIFO写入n字节的语义.webp')" alt="向一个管道或 FIFO 写入 n 字节的语义">
 
 
+## 45 - System V IPC 介绍
+
+
+
+
+
 ## 63 - 其他备选的 I/O 模型
 
 ### 整体概览

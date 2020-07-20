@@ -188,7 +188,8 @@ module.exports = {
                     collapsable: true,
                     children: [
                         "/manual/discuz/开发技能树",
-                        "/manual/discuz/2020 书单"
+                        "/manual/discuz/2020 书单",
+                        "/manual/discuz/面试杂谈"
                     ]
                 }
             ],

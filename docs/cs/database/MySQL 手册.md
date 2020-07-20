@@ -24,6 +24,28 @@ https://dev.mysql.com/get/mysql80-community-release-el7-1.noarch.rpm
 10. 重新启动MySQL服务: `service mysqld restart`
 11. 停止MySQL服务: `service mysqld stop`
 
+* MySQL 源码编译安装
+
+```bash
+# 下载 MySQL 源码, 选择带有 Boost Headers 的版本
+https://downloads.mysql.com/archives/community/
+https://downloads.mysql.com/archives/get/p/23/file/mysql-boost-5.7.17.tar.gz
+
+# 安装常用依赖包
+yum -y install gcc gcc-c++ ncurses ncurses-devel bison libgcrypt perl make cmake openssl
+
+# 新建 MySQL 安装目录及创建 MySQL 用户组和用户, 修改目录所有者权限
+mkdir -p /usr/local/mysql /usr/local/mysql/{data,logs,pids}
+
+groupadd mysql
+useradd -r -g mysql -s /bin/false -M mysql
+chown -R mysql:mysql /usr/local/mysql
+
+# 编译, 此处对应的是自带 boost headers 的版本
+cmake . -DCMAKE_INSTALL_PREFIX=/usr/local/mysql -DMYSQL_DATADIR=/usr/local/mysql/data -DDEFAULT_CHARSET=utf8 -DDEFAULT_COLLATION=utf8_general_ci -DMYSQL_TCP_PORT=3306 -DMYSQL_USER=mysql -DWITH_MYISAM_STORAGE_ENGINE=1 -DWITH_INNOBASE_STORAGE_ENGINE=1 -DWITH_ARCHIVE_STORAGE_ENGINE=1 -DWITH_BLACKHOLE_STORAGE_ENGINE=1 -DWITH_MEMORY_STORAGE_ENGINE=1 -DENABLE_DOWNLOADS=0 -DDOWNLOAD_BOOST=0 -DWITH_BOOST=/home/xmcloud/mysql-5.7.17/boost
+```
+
+
 ### 2. MySQL 配置
 #### 重要目录
 ```shell

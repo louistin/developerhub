@@ -36,7 +36,7 @@ make && make install
 chown www:www wiki -R
 ```
 
-```
+```conf
 # conf 配置参考
 server {
     listen 1080;
@@ -80,4 +80,13 @@ server {
         # fastcgi_pass unix:/var/run/php5-fpm.sock; #old php version
     }
 }
+```
+
+## mount 配置
+
+```bash
+# linux 端可能存在的问题
+yum install cifs*
+
+sudo mount -t cifs //192.168.0.231/alpha /home/louis/alpha -o username=Everyone,noperm,nounix,noserverino,uid=1000,gid=1000
 ```

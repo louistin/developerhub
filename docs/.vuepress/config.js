@@ -163,6 +163,7 @@ module.exports = {
                     title: 'Windows 开发环境',
                     collapsable: true,
                     children: [
+                        "/manual/windows/Windows 10 前端开发环境搭建指南",
                         "/manual/windows/Windows 环境配置指南",
                         "/manual/windows/FFMPEG x265 Windows 编译"
                     ]
